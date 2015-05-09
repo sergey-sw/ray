@@ -1,0 +1,43 @@
+allprojects {
+    vcs = 'svn'
+    group = 'com.intel.eve'
+    version = '1.0'
+}
+
+repositories {
+    mavenCentral()
+}
+
+apply(plugin: 'idea')
+apply(plugin: 'maven')
+
+configure(rootProject) {
+    apply plugin: 'java'
+    apply plugin: 'idea'
+
+    dependencies {
+        compile 'org.reflections:reflections:0.9.9'
+    }
+
+    sourceSets {
+        main {
+            java {
+                srcDir 'src'
+            }
+        }
+        test {
+            java {
+                srcDir 'test'
+            }
+        }
+    }
+
+    task sourceJar(type: Jar) {
+        from file('src')
+        classifier = 'sources'
+    }
+
+    artifacts {
+        archives sourceJar
+    }
+}
