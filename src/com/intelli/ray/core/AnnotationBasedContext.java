@@ -1,6 +1,5 @@
 package com.intelli.ray.core;
 
-import com.intelli.ray.base_scope.ReflectionHelper;
 import org.reflections.Reflections;
 
 import javax.annotation.PostConstruct;

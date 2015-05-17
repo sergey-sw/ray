@@ -1,7 +1,5 @@
 package com.intelli.ray.core;
 
-import com.intelli.ray.base_scope.ReflectionHelper;
-
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.OutputStream;

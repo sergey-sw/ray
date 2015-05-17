@@ -1,6 +1,4 @@
-package com.intelli.ray.base_scope;
-
-import com.intelli.ray.core.ManagedConstructor;
+package com.intelli.ray.core;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
