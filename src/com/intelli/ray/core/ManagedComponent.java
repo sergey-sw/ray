@@ -12,7 +12,8 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ManagedComponent {
-    String name();
+
+    String name() default "";
 
     Scope scope() default Scope.SINGLETON;
 }

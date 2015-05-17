@@ -1,7 +1,6 @@
 allprojects {
-    vcs = 'svn'
     group = 'com.intel.eve'
-    version = '1.0'
+    version = '1.1'
 }
 
 repositories {
@@ -17,6 +16,7 @@ configure(rootProject) {
 
     dependencies {
         compile 'org.reflections:reflections:0.9.9'
+        testCompile 'junit:junit:4.10'
     }
 
     sourceSets {

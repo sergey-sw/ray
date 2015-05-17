@@ -9,11 +9,23 @@ package com.intelli.ray.core;
  */
 public class BeanNotFoundException extends IllegalArgumentException {
 
-    public <T> BeanNotFoundException(Class<T> beanClass) {
-        super(String.format("Bean of class '%s' is not present in context", beanClass.getName()));
+    Object id;
+    static String classPattern = "Bean of class '%s' is not present in context";
+    static String namePattern = "Bean with name '%s' is not present in context";
+
+
+    public BeanNotFoundException(Object id) {
+        this.id = id;
     }
 
-    public BeanNotFoundException(String name) {
-        super(String.format("Bean with name '%s' is not present in context", name));
+    @Override
+    public String getMessage() {
+        if (id instanceof String) {
+            return String.format(namePattern, id);
+        } else if (id instanceof Class) {
+            return String.format(classPattern, ((Class) id).getName());
+        } else {
+            return super.getMessage();
+        }
     }
 }

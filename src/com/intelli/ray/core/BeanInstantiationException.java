@@ -6,8 +6,7 @@ package com.intelli.ray.core;
  */
 public class BeanInstantiationException extends RuntimeException {
 
-    public BeanInstantiationException() {
-    }
+    static final String scopePattern = "Failed to instantiate bean with name %s. Expected scope: %s. Actual scope: %s.";
 
     public BeanInstantiationException(String message) {
         super(message);
@@ -21,7 +20,7 @@ public class BeanInstantiationException extends RuntimeException {
         super(cause);
     }
 
-    public BeanInstantiationException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
+    public BeanInstantiationException(BeanDefinition definition, Scope expected) {
+        super(String.format(scopePattern, definition, expected, definition.getScope()));
     }
 }

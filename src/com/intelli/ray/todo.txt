@@ -1,0 +1,3 @@
+-logging
+-overriding beans
+-inject bean collections

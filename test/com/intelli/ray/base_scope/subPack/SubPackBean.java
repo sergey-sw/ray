@@ -1,4 +1,4 @@
-package com.intelli.ray.subPack;
+package com.intelli.ray.base_scope.subPack;
 
 import com.intelli.ray.core.ManagedComponent;
 

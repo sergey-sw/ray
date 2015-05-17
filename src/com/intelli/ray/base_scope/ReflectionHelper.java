@@ -1,6 +1,9 @@
-package com.intelli.ray.util;
+package com.intelli.ray.base_scope;
+
+import com.intelli.ray.core.ManagedConstructor;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.Set;
@@ -22,5 +25,15 @@ public class ReflectionHelper {
             clazz = clazz.getSuperclass();
         }
         return fields.toArray(new Field[fields.size()]);
+    }
+
+    public static Constructor getManagedConstructor(Class clazz) {
+        Constructor[] constructors = clazz.getConstructors();
+        for (Constructor constructor : constructors) {
+            if (constructor.getAnnotation(ManagedConstructor.class) != null) {
+                return constructor;
+            }
+        }
+        return null;
     }
 }
