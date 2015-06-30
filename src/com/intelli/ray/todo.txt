@@ -1,3 +1,8 @@
 -overriding beans
 -inject bean collections
 - custom inject annotation
+- fix concurrency
+- fix context - factory encapsulation
+- lazy construction
+- move base logic from annotation context to common
+- scopes

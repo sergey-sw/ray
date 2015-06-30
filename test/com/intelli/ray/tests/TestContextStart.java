@@ -13,10 +13,10 @@ public class TestContextStart extends TestCase {
     public void test() {
         Context context = new AnnotationBasedContext("com.intelli.ray.base_scope");
 
-        assertFalse(context.isStarted());
+        assertFalse(context.isActive());
 
-        context.start();
+        context.refresh();
 
-        assertTrue(context.isStarted());
+        assertTrue(context.isActive());
     }
 }

@@ -10,9 +10,11 @@ import com.intelli.ray.log.LoggerRegistry;
  */
 public interface Context {
 
-    boolean isStarted();
+    boolean isActive();
 
-    void start();
+    void refresh();
+
+    void destroy();
 
     BeanContainer getBeanContainer();
 

@@ -13,7 +13,7 @@ public class TestInjectPrototypeField extends RayTest {
 
     public void test() throws Exception {
         Context protoCtx = new AnnotationBasedContext("com.intelli.ray.proto_test_scope");
-        protoCtx.start();
+        protoCtx.refresh();
 
         BeanContainer container = protoCtx.getBeanContainer();
         BeanWithInjections bean = container.getBean(BeanWithInjections.class);

@@ -1,6 +1,5 @@
 package com.intelli.ray.core;
 
-import java.io.OutputStream;
 import java.util.Collection;
 
 /**
@@ -31,5 +30,5 @@ public interface BeanContainer {
 
     void register(BeanDefinition beanDefinition);
 
-    void printConfiguredBeans(OutputStream outputStream);
+    void destroyBeans();
 }

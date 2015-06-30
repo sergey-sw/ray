@@ -1,10 +1,9 @@
 package com.intelli.ray.core;
 
 import com.intelli.ray.log.ContextLogger;
+import com.intelli.ray.reflection.ReflectionHelper;
 
 import javax.annotation.PostConstruct;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -18,9 +17,9 @@ import java.util.concurrent.ConcurrentHashMap;
 @SuppressWarnings("unchecked")
 public class SimpleBeanContainer implements BeanContainer {
 
-    protected Map<String, BeanDefinition> definitionByName = new ConcurrentHashMap<>();
-    protected Map<Class, BeanDefinition> definitionByClass = new ConcurrentHashMap<>();
-    protected ContextLogger logger;
+    protected final Map<String, BeanDefinition> definitionByName = new ConcurrentHashMap<>();
+    protected final Map<Class, BeanDefinition> definitionByClass = new ConcurrentHashMap<>();
+    protected final ContextLogger logger;
 
     public SimpleBeanContainer(ContextLogger logger) {
         this.logger = logger;
@@ -115,21 +114,27 @@ public class SimpleBeanContainer implements BeanContainer {
     }
 
     @Override
-    public void printConfiguredBeans(OutputStream outputStream) {
-        if (outputStream == null) outputStream = System.out;
-
-        try {
-            outputStream.write("Registered beans :\n".getBytes());
-            for (Map.Entry<String, BeanDefinition> entry : definitionByName.entrySet()) {
-                String string = entry.getKey() + " : " + entry.getValue().beanClass.getName() + "\n";
-                outputStream.write(string.getBytes());
+    public synchronized void destroyBeans() {
+        logger.log("Destroying beans in container : " + this);
+        for (BeanDefinition definition : definitionByClass.values()) {
+            if (definition.singletonInstance instanceof Disposable) {
+                logger.log(new Date() + " - Destroying disposable bean " + definition);
+                ((Disposable) definition.singletonInstance).onDestroy();
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
+
+        definitionByClass.clear();
+        definitionByName.clear();
     }
 
-    protected BeanDefinition checkNotNull(BeanDefinition definition, Object id) {
+    protected BeanDefinition checkNotNull(BeanDefinition definition, String id) {
+        if (definition == null) {
+            throw new BeanNotFoundException(id);
+        }
+        return definition;
+    }
+
+    protected BeanDefinition checkNotNull(BeanDefinition definition, Class id) {
         if (definition == null) {
             throw new BeanNotFoundException(id);
         }

@@ -23,7 +23,7 @@ public class LoggingTest extends TestCase {
             }
         };
         loggerRegistry.addLogConsumer(consumer);
-        context.start();
+        context.refresh();
 
         String log = sb.toString();
         assertNotNull(log);

@@ -3,7 +3,6 @@ package com.intelli.ray.reflection;
 import com.intelli.ray.log.ContextLogger;
 
 import java.io.*;
-import java.lang.annotation.Annotation;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -36,20 +35,10 @@ public class Scanner {
         for (URL url : allUrls) {
             scan(url);
         }
-
-        for (Class aClass : classes) {
-            System.out.println(aClass.getName());
-        }
     }
 
-    public Iterable<Class> getTypesAnnotatedWith(final Class<? extends Annotation> annotation) {
-        Set<Class> result = new HashSet<>();
-        for (Class clazz : classes) {
-            if (clazz.isAnnotationPresent(annotation)) {
-                result.add(clazz);
-            }
-        }
-        return result;
+    public Set<Class> getClasses() {
+        return classes;
     }
 
     private void scan(URL url) {

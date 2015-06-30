@@ -2,6 +2,7 @@ package com.intelli.ray.core;
 
 import com.intelli.ray.log.ContextLogger;
 import com.intelli.ray.log.LoggerRegistry;
+import com.intelli.ray.reflection.ReflectionHelper;
 import com.intelli.ray.reflection.Scanner;
 
 import javax.annotation.PostConstruct;
@@ -21,10 +22,13 @@ public class AnnotationBasedContext implements Context {
 
     protected String[] scanLocations;
 
-    protected ContextLogger logger = new ContextLogger();
-    protected BeanContainer beanContainer = new SimpleBeanContainer(logger);
+    protected final ContextLogger logger = new ContextLogger();
+    protected volatile BeanContainer beanContainer;
 
     protected volatile boolean started = false;
+    protected boolean closed = false;
+
+    private final Object lifecycleMonitor = new Object();
 
     /**
      * Builds the context by annotation scanning in specified locations.
@@ -38,6 +42,9 @@ public class AnnotationBasedContext implements Context {
 
     @Override
     public BeanContainer getBeanContainer() {
+        if (beanContainer == null) {
+            throw new IllegalStateException("Bean container was not created yet or context was destroyed");
+        }
         return beanContainer;
     }
 
@@ -47,43 +54,75 @@ public class AnnotationBasedContext implements Context {
     }
 
     @Override
-    public boolean isStarted() {
+    public boolean isActive() {
         return started;
     }
 
     @Override
-    public void start() throws ContextInitializationException {
-        registerBeans();
-        injectSingletonDependencies();
-        invokePostConstruct();
-        started = true;
+    public void refresh() {
+        synchronized (lifecycleMonitor) {
+            createBeanContainer();
+            try {
+                registerBeanDefinitions();
+                injectSingletonDependencies();
+                invokePostConstruct();
+
+                started = true;
+            } catch (BeanInstantiationException e) {
+                beanContainer.destroyBeans();
+                throw e;
+            }
+        }
     }
 
-    protected void registerBeans() {
+    @Override
+    public void destroy() {
+        synchronized (lifecycleMonitor) {
+            boolean doClose = started && !closed;
+
+            if (doClose) {
+                beanContainer.destroyBeans();
+                beanContainer = null;
+                started = false;
+                closed = true;
+            }
+        }
+    }
+
+    protected BeanContainer createBeanContainer() {
+        if (beanContainer != null) {
+            beanContainer.destroyBeans();
+        }
+        beanContainer = new SimpleBeanContainer(logger);
+        return beanContainer;
+    }
+
+    protected void registerBeanDefinitions() {
         Scanner scanner = new Scanner(logger, scanLocations);
 
-        for (Class clazz : scanner.getTypesAnnotatedWith(ManagedComponent.class)) {
-            try {
-                ManagedComponent ann = (ManagedComponent) clazz.getAnnotation(ManagedComponent.class);
-                String beanId = !ann.name().isEmpty() ? ann.name() : clazz.getName();
+        for (Class clazz : ReflectionHelper.getTypesAnnotatedWith(scanner.getClasses(), ManagedComponent.class)) {
 
-                Scope scope = ann.scope();
-                Constructor managedConstructor = ReflectionHelper.getManagedConstructor(clazz);
-                if (scope == Scope.SINGLETON && managedConstructor != null) {
-                    throw new ContextInitializationException("Managed constructor is not supported in singletons");
-                }
+            ManagedComponent ann = (ManagedComponent) clazz.getAnnotation(ManagedComponent.class);
+            String beanId = !ann.name().isEmpty() ? ann.name() : clazz.getName();
 
-                BeanDefinition definition;
-                if (managedConstructor != null) {
-                    definition = new BeanDefinition(beanId, scope, clazz, managedConstructor);
-                } else {
-                    definition = new BeanDefinition(beanId, scope, clazz, clazz.newInstance());
-                }
-
-                beanContainer.register(definition);
-            } catch (InstantiationException | IllegalAccessException e) {
-                throw new ContextInitializationException(e);
+            Scope scope = ann.scope();
+            Constructor managedConstructor = ReflectionHelper.getManagedConstructor(clazz);
+            if (scope == Scope.SINGLETON && managedConstructor != null) {
+                throw new BeanInstantiationException("Managed constructor is not supported in singletons");
             }
+
+            BeanDefinition definition;
+            if (managedConstructor != null) {
+                definition = new BeanDefinition(beanId, scope, clazz, managedConstructor);
+            } else {
+                try {
+                    definition = new BeanDefinition(beanId, scope, clazz, clazz.newInstance());
+                } catch (InstantiationException | IllegalAccessException e) {
+                    throw new BeanInstantiationException(e);
+                }
+            }
+
+            beanContainer.register(definition);
         }
     }
 
@@ -105,7 +144,7 @@ public class AnnotationBasedContext implements Context {
         Class fieldClazz = field.getType();
         BeanDefinition fieldBeanDefinition = beanContainer.getBeanDefinition(fieldClazz);
         if (fieldBeanDefinition == null) {
-            throw new ContextInitializationException("Can not inject property '" + field.getName() + "' in bean " +
+            throw new BeanInstantiationException("Can not inject property '" + field.getName() + "' in bean " +
                     definition.beanClass.getName() + ", because property bean class " + fieldClazz.getName()
                     + " is not present in context.");
         }

@@ -14,6 +14,6 @@ public abstract class RayTest extends TestCase {
 
     static {
         context = new AnnotationBasedContext("com.intelli.ray.base_scope");
-        context.start();
+        context.refresh();
     }
 }
