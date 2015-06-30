@@ -2,7 +2,7 @@ package com.intelli.ray.core;
 
 import com.intelli.ray.log.ContextLogger;
 import com.intelli.ray.log.LoggerRegistry;
-import org.reflections.Reflections;
+import com.intelli.ray.reflection.Scanner;
 
 import javax.annotation.PostConstruct;
 import java.lang.reflect.Constructor;
@@ -60,9 +60,9 @@ public class AnnotationBasedContext implements Context {
     }
 
     protected void registerBeans() {
-        Reflections reflections = new Reflections(scanLocations);
+        Scanner scanner = new Scanner(logger, scanLocations);
 
-        for (Class clazz : reflections.getTypesAnnotatedWith(ManagedComponent.class)) {
+        for (Class clazz : scanner.getTypesAnnotatedWith(ManagedComponent.class)) {
             try {
                 ManagedComponent ann = (ManagedComponent) clazz.getAnnotation(ManagedComponent.class);
                 String beanId = !ann.name().isEmpty() ? ann.name() : clazz.getName();

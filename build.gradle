@@ -15,7 +15,6 @@ configure(rootProject) {
     apply plugin: 'idea'
 
     dependencies {
-        compile 'org.reflections:reflections:0.9.9'
         testCompile 'junit:junit:4.10'
     }
 
