@@ -1,5 +1,7 @@
 package com.intelli.ray.core;
 
+import com.intelli.ray.log.LoggerRegistry;
+
 /**
  * Context represents a scope of related application components.
  * <p/>
@@ -13,4 +15,6 @@ public interface Context {
     void start();
 
     BeanContainer getBeanContainer();
+
+    LoggerRegistry getLoggerRegistry();
 }

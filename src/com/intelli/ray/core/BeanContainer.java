@@ -4,6 +4,8 @@ import java.io.OutputStream;
 import java.util.Collection;
 
 /**
+ * BeanContainer provides access to registered beans.
+ * <p/>
  * Author: Sergey42
  * Date: 17.05.2015 17:24
  */

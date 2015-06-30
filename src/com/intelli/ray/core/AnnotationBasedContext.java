@@ -1,5 +1,7 @@
 package com.intelli.ray.core;
 
+import com.intelli.ray.log.ContextLogger;
+import com.intelli.ray.log.LoggerRegistry;
 import org.reflections.Reflections;
 
 import javax.annotation.PostConstruct;
@@ -18,7 +20,9 @@ import java.util.ListIterator;
 public class AnnotationBasedContext implements Context {
 
     protected String[] scanLocations;
-    protected BeanContainer beanContainer = new SimpleBeanContainer();
+
+    protected ContextLogger logger = new ContextLogger();
+    protected BeanContainer beanContainer = new SimpleBeanContainer(logger);
 
     protected volatile boolean started = false;
 
@@ -35,6 +39,11 @@ public class AnnotationBasedContext implements Context {
     @Override
     public BeanContainer getBeanContainer() {
         return beanContainer;
+    }
+
+    @Override
+    public LoggerRegistry getLoggerRegistry() {
+        return logger.getLoggerRegistry();
     }
 
     @Override
@@ -66,9 +75,9 @@ public class AnnotationBasedContext implements Context {
 
                 BeanDefinition definition;
                 if (managedConstructor != null) {
-                    definition = new BeanDefinition(beanId, scope, clazz, null, managedConstructor);
+                    definition = new BeanDefinition(beanId, scope, clazz, managedConstructor);
                 } else {
-                    definition = new BeanDefinition(beanId, scope, clazz, clazz.newInstance(), null);
+                    definition = new BeanDefinition(beanId, scope, clazz, clazz.newInstance());
                 }
 
                 beanContainer.register(definition);

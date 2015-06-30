@@ -1,5 +1,7 @@
 package com.intelli.ray.core;
 
+import com.intelli.ray.log.ContextLogger;
+
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -7,6 +9,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Author: Sergey42
@@ -15,8 +18,13 @@ import java.util.*;
 @SuppressWarnings("unchecked")
 public class SimpleBeanContainer implements BeanContainer {
 
-    protected Map<String, BeanDefinition> definitionByName = new HashMap<>();
-    protected Map<Class, BeanDefinition> definitionByClass = new HashMap<>();
+    protected Map<String, BeanDefinition> definitionByName = new ConcurrentHashMap<>();
+    protected Map<Class, BeanDefinition> definitionByClass = new ConcurrentHashMap<>();
+    protected ContextLogger logger;
+
+    public SimpleBeanContainer(ContextLogger logger) {
+        this.logger = logger;
+    }
 
     @Override
     public <T> T getBean(Class<T> beanClass) {
@@ -78,6 +86,9 @@ public class SimpleBeanContainer implements BeanContainer {
             T prototypeInstance = (T) beanDefinition.managedConstructor.newInstance(constructorParams);
             doPrototypeInject(prototypeInstance, beanDefinition);
             invokePostConstructMethods(prototypeInstance);
+
+            logger.log(new Date() + " - Created prototype instance of class " + beanClass.getSimpleName());
+
             return prototypeInstance;
         } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
             throw new BeanInstantiationException(e);
@@ -99,9 +110,8 @@ public class SimpleBeanContainer implements BeanContainer {
         definitionByName.put(beanDefinition.id, beanDefinition);
         definitionByClass.put(beanDefinition.beanClass, beanDefinition);
 
-        System.out.println(String.format("Registered bean of class %s with scope %s",
+        logger.log(String.format(new Date() + " - Registered bean of class %s with scope %s",
                 beanDefinition.beanClass.getName(), beanDefinition.scope.getId()));
-
     }
 
     @Override
