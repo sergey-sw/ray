@@ -1,6 +1,7 @@
 package com.intelli.ray.core;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 
 /**
  * Author: Sergey42
@@ -14,20 +15,24 @@ public class BeanDefinition {
     protected final Object singletonInstance;
     protected final Constructor managedConstructor;
 
-    public BeanDefinition(String id, Scope scope, Class beanClass, Constructor constructor) {
+    protected final Method[] initMethods;
+
+    public BeanDefinition(String id, Scope scope, Class beanClass, Constructor constructor, Method[] methods) {
         this.id = id;
         this.scope = scope;
         this.beanClass = beanClass;
         this.singletonInstance = null;
         this.managedConstructor = constructor;
+        this.initMethods = methods;
     }
 
-    public BeanDefinition(String id, Scope scope, Class beanClass, Object singletonInstance) {
+    public BeanDefinition(String id, Scope scope, Class beanClass, Object singletonInstance, Method[] methods) {
         this.id = id;
         this.scope = scope;
         this.beanClass = beanClass;
         this.singletonInstance = singletonInstance;
         this.managedConstructor = null;
+        this.initMethods = methods;
     }
 
     public void scopeShouldBe(Scope expected) {

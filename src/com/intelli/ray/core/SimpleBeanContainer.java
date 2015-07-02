@@ -3,7 +3,6 @@ package com.intelli.ray.core;
 import com.intelli.ray.log.ContextLogger;
 import com.intelli.ray.reflection.ReflectionHelper;
 
-import javax.annotation.PostConstruct;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -84,7 +83,7 @@ public class SimpleBeanContainer implements BeanContainer {
             //noinspection unchecked
             T prototypeInstance = (T) beanDefinition.managedConstructor.newInstance(constructorParams);
             doPrototypeInject(prototypeInstance, beanDefinition);
-            invokePostConstructMethods(prototypeInstance);
+            invokeInitMethods(beanDefinition, prototypeInstance);
 
             logger.log(new Date() + " - Created prototype instance of class " + beanClass.getSimpleName());
 
@@ -127,6 +126,32 @@ public class SimpleBeanContainer implements BeanContainer {
         definitionByName.clear();
     }
 
+    @Override
+    public void invokeInitMethods(BeanDefinition beanDefinition) {
+        invokeInitMethods(beanDefinition, beanDefinition.singletonInstance);
+    }
+
+    @Override
+    public void invokeInitMethods(BeanDefinition beanDefinition, Object instance) {
+        Method[] initMethods = beanDefinition.initMethods;
+        if (initMethods == null) {
+            return;
+        }
+
+        for (int i = initMethods.length - 1; i >= 0; i--) {
+            Method method = initMethods[i];
+            if (!method.isAccessible()) {
+                method.setAccessible(true);
+            }
+            try {
+                method.invoke(instance);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                throw new BeanInstantiationException("Failed to execute post construct methods of bean " +
+                        beanDefinition.beanClass.getName(), e);
+            }
+        }
+    }
+
     protected BeanDefinition checkNotNull(BeanDefinition definition, String id) {
         if (definition == null) {
             throw new BeanNotFoundException(id);
@@ -146,9 +171,9 @@ public class SimpleBeanContainer implements BeanContainer {
             //noinspection unchecked
             T prototypeInstance = (T) beanDefinition.beanClass.newInstance();
             doPrototypeInject(prototypeInstance, beanDefinition);
-            invokePostConstructMethods(prototypeInstance);
+            invokeInitMethods(beanDefinition, prototypeInstance);
             return prototypeInstance;
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             throw new BeanInstantiationException(e);
         }
     }
@@ -183,31 +208,6 @@ public class SimpleBeanContainer implements BeanContainer {
             field.set(beanInstance, getBean(fieldBeanDefinition.beanClass));
         } catch (IllegalAccessException e) {
             throw new BeanInstantiationException(e);
-        }
-    }
-
-    protected void invokePostConstructMethods(Object component) throws InvocationTargetException, IllegalAccessException {
-        List<Method> postConstructMethods = new ArrayList<>(4);
-        List<String> methodNames = new ArrayList<>(4);
-        Class clazz = component.getClass();
-        while (clazz != Object.class) {
-            Method[] classMethods = clazz.getDeclaredMethods();
-            for (Method method : classMethods) {
-                if (method.isAnnotationPresent(PostConstruct.class) && !methodNames.contains(method.getName())) {
-                    postConstructMethods.add(method);
-                    methodNames.add(method.getName());
-                }
-            }
-            clazz = clazz.getSuperclass();
-        }
-
-        ListIterator<Method> iterator = postConstructMethods.listIterator(postConstructMethods.size());
-        while (iterator.hasPrevious()) {
-            Method method = iterator.previous();
-            if (!method.isAccessible()) {
-                method.setAccessible(true);
-            }
-            method.invoke(component);
         }
     }
 }

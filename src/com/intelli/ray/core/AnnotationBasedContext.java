@@ -1,34 +1,22 @@
 package com.intelli.ray.core;
 
-import com.intelli.ray.log.ContextLogger;
-import com.intelli.ray.log.LoggerRegistry;
 import com.intelli.ray.reflection.ReflectionHelper;
 import com.intelli.ray.reflection.Scanner;
 
 import javax.annotation.PostConstruct;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 
 /**
  * Author: Sergey42
  * Date: 14.11.13 21:11
  */
-public class AnnotationBasedContext implements Context {
+public class AnnotationBasedContext extends BaseContext {
 
     protected String[] scanLocations;
-
-    protected final ContextLogger logger = new ContextLogger();
-    protected volatile BeanContainer beanContainer;
-
-    protected volatile boolean started = false;
-    protected boolean closed = false;
-
-    private final Object lifecycleMonitor = new Object();
 
     /**
      * Builds the context by annotation scanning in specified locations.
@@ -41,62 +29,6 @@ public class AnnotationBasedContext implements Context {
     }
 
     @Override
-    public BeanContainer getBeanContainer() {
-        if (beanContainer == null) {
-            throw new IllegalStateException("Bean container was not created yet or context was destroyed");
-        }
-        return beanContainer;
-    }
-
-    @Override
-    public LoggerRegistry getLoggerRegistry() {
-        return logger.getLoggerRegistry();
-    }
-
-    @Override
-    public boolean isActive() {
-        return started;
-    }
-
-    @Override
-    public void refresh() {
-        synchronized (lifecycleMonitor) {
-            createBeanContainer();
-            try {
-                registerBeanDefinitions();
-                injectSingletonDependencies();
-                invokePostConstruct();
-
-                started = true;
-            } catch (BeanInstantiationException e) {
-                beanContainer.destroyBeans();
-                throw e;
-            }
-        }
-    }
-
-    @Override
-    public void destroy() {
-        synchronized (lifecycleMonitor) {
-            boolean doClose = started && !closed;
-
-            if (doClose) {
-                beanContainer.destroyBeans();
-                beanContainer = null;
-                started = false;
-                closed = true;
-            }
-        }
-    }
-
-    protected BeanContainer createBeanContainer() {
-        if (beanContainer != null) {
-            beanContainer.destroyBeans();
-        }
-        beanContainer = new SimpleBeanContainer(logger);
-        return beanContainer;
-    }
-
     protected void registerBeanDefinitions() {
         Scanner scanner = new Scanner(logger, scanLocations);
 
@@ -112,11 +44,12 @@ public class AnnotationBasedContext implements Context {
             }
 
             BeanDefinition definition;
+            Method[] initMethods = extractInitMethods(clazz);
             if (managedConstructor != null) {
-                definition = new BeanDefinition(beanId, scope, clazz, managedConstructor);
+                definition = new BeanDefinition(beanId, scope, clazz, managedConstructor, initMethods);
             } else {
                 try {
-                    definition = new BeanDefinition(beanId, scope, clazz, clazz.newInstance());
+                    definition = new BeanDefinition(beanId, scope, clazz, clazz.newInstance(), initMethods);
                 } catch (InstantiationException | IllegalAccessException e) {
                     throw new BeanInstantiationException(e);
                 }
@@ -126,6 +59,7 @@ public class AnnotationBasedContext implements Context {
         }
     }
 
+    @Override
     protected void injectSingletonDependencies() {
         for (BeanDefinition definition : beanContainer.getBeanDefinitions()) {
             if (definition.scope == Scope.PROTOTYPE) continue;
@@ -139,40 +73,10 @@ public class AnnotationBasedContext implements Context {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    protected void doInject(Field field, Object beanInstance, BeanDefinition definition) {
-        Class fieldClazz = field.getType();
-        BeanDefinition fieldBeanDefinition = beanContainer.getBeanDefinition(fieldClazz);
-        if (fieldBeanDefinition == null) {
-            throw new BeanInstantiationException("Can not inject property '" + field.getName() + "' in bean " +
-                    definition.beanClass.getName() + ", because property bean class " + fieldClazz.getName()
-                    + " is not present in context.");
-        }
-        try {
-            if (!field.isAccessible()) field.setAccessible(true);
-            field.set(beanInstance, beanContainer.getBeanAnyScope(fieldBeanDefinition.beanClass));
-        } catch (IllegalAccessException e) {
-            throw new BeanInstantiationException(e);
-        }
-    }
-
-    protected void invokePostConstruct() {
-        for (BeanDefinition beanDefinition : beanContainer.getBeanDefinitions()) {
-            if (beanDefinition.scope == Scope.SINGLETON) {
-                try {
-                    invokePostConstructMethods(beanDefinition.singletonInstance);
-                } catch (IllegalAccessException | InvocationTargetException e) {
-                    throw new BeanInstantiationException("Failed to execute post construct methods of bean " +
-                            beanDefinition.beanClass.getName(), e);
-                }
-            }
-        }
-    }
-
-    protected void invokePostConstructMethods(Object component) throws InvocationTargetException, IllegalAccessException {
+    protected Method[] extractInitMethods(Class clazz) {
         List<Method> postConstructMethods = new ArrayList<>(4);
         List<String> methodNames = new ArrayList<>(4);
-        Class clazz = component.getClass();
+
         while (clazz != Object.class) {
             Method[] classMethods = clazz.getDeclaredMethods();
             for (Method method : classMethods) {
@@ -184,13 +88,7 @@ public class AnnotationBasedContext implements Context {
             clazz = clazz.getSuperclass();
         }
 
-        ListIterator<Method> iterator = postConstructMethods.listIterator(postConstructMethods.size());
-        while (iterator.hasPrevious()) {
-            Method method = iterator.previous();
-            if (!method.isAccessible()) {
-                method.setAccessible(true);
-            }
-            method.invoke(component);
-        }
+        int size = postConstructMethods.size();
+        return postConstructMethods.toArray(new Method[size]);
     }
 }

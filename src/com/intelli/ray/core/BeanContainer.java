@@ -30,5 +30,9 @@ public interface BeanContainer {
 
     void register(BeanDefinition beanDefinition);
 
+    void invokeInitMethods(BeanDefinition beanDefinition);
+
+    void invokeInitMethods(BeanDefinition beanDefinition, Object instance);
+
     void destroyBeans();
 }
