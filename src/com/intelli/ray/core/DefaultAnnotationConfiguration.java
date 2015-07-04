@@ -1,6 +1,7 @@
 package com.intelli.ray.core;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 
@@ -36,6 +37,11 @@ public class DefaultAnnotationConfiguration implements Configuration {
     @Override
     public Iterable<Class<? extends Annotation>> getInitMethodAnnotations() {
         return Arrays.<Class<? extends Annotation>>asList(PostConstruct.class);
+    }
+
+    @Override
+    public Iterable<Class<? extends Annotation>> getDestroyMethodAnnotations() {
+        return Arrays.<Class<? extends Annotation>>asList(PreDestroy.class);
     }
 
     @Override

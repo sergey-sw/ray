@@ -1,8 +1,11 @@
 package com.intelli.ray.reflection;
 
 import com.intelli.ray.log.ContextLogger;
+import com.intelli.ray.util.Exceptions;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -51,7 +54,7 @@ public class Scanner {
                         name = input.substring(0, input.lastIndexOf(".class"));
                         classes.add(Class.forName(name));
                     } catch (ClassNotFoundException e) {
-                        logger.log("Could not load class " + name + "\n" + printException(e));
+                        logger.log("Could not load class " + name + "\n" + Exceptions.toStr(e));
                     }
                 }
             }
@@ -76,7 +79,7 @@ public class Scanner {
                 }
             }
         } catch (IOException e) {
-            logger.log("Error getting resources for " + resourceName + "\n" + printException(e));
+            logger.log("Error getting resources for " + resourceName + "\n" + Exceptions.toStr(e));
         }
         return distinctUrls(result);
     }
@@ -96,17 +99,6 @@ public class Scanner {
             //return original urls as set, prefer backward comp over potential performance issue
             return new HashSet<>(urls);
         }
-    }
-
-    private static String printException(Throwable ex) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ex.printStackTrace(new PrintStream(baos));
-        try {
-            baos.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return baos.toString();
     }
 
     private static String resourceName(String name) {
@@ -137,7 +129,7 @@ public class Scanner {
                 }
             } catch (Throwable e) {
                 logger.log("Could not create Dir using " + type + " from url " + url.toExternalForm() + ". " +
-                        "Skipping.\n" + printException(e));
+                        "Skipping.\n" + Exceptions.toStr(e));
             }
         }
 

@@ -50,6 +50,13 @@ public interface Configuration {
 
     /**
      * Method declares what kind of annotations are used to indicate that
+     * methods should be invoked on destruction phase.
+     * See {@link javax.annotation.PreDestroy}
+     */
+    Iterable<Class<? extends Annotation>> getDestroyMethodAnnotations();
+
+    /**
+     * Method declares what kind of annotations are used to indicate that
      * component fields should be autowired with values on initialization phase.
      * See {@link com.intelli.ray.core.Inject}
      */

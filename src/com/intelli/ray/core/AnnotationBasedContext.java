@@ -6,8 +6,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import static com.intelli.ray.reflection.ReflectionHelper.*;
@@ -60,13 +58,14 @@ public class AnnotationBasedContext extends BaseConfigurableContext {
             }
 
             BeanDefinition definition;
-            Method[] initMethods = extractInitMethods(clazz);
-            Field[] autowiredFields = extractAutowiredFields(clazz);
+            Method[] initMethods = getUniqueMethodsAnnotatedWith(clazz, getConfiguration().getInitMethodAnnotations());
+            Method[] destroyMethods = getUniqueMethodsAnnotatedWith(clazz, getConfiguration().getDestroyMethodAnnotations());
+            Field[] autowiredFields = getFieldsAnnotatedWith(clazz, getConfiguration().getAutowiredAnnotations());
             if (constructor != null) {
-                definition = new BeanDefinition(beanId, scope, clazz, constructor, initMethods, autowiredFields);
+                definition = new BeanDefinition(beanId, scope, clazz, constructor, initMethods, destroyMethods, autowiredFields);
             } else {
                 try {
-                    definition = new BeanDefinition(beanId, scope, clazz, clazz.newInstance(), initMethods, autowiredFields);
+                    definition = new BeanDefinition(beanId, scope, clazz, clazz.newInstance(), initMethods, destroyMethods, autowiredFields);
                 } catch (InstantiationException | IllegalAccessException e) {
                     throw new BeanInstantiationException(e);
                 }
@@ -82,51 +81,11 @@ public class AnnotationBasedContext extends BaseConfigurableContext {
             if (definition.scope == Scope.PROTOTYPE) continue;
 
             Object beanInstance = definition.singletonInstance;
-            Field[] fields = getAllAnnotatedFields(beanInstance.getClass(), getConfiguration().getAutowiredAnnotations());
+            Field[] fields = getFieldsAnnotatedWith(beanInstance.getClass(), getConfiguration().getAutowiredAnnotations());
 
             for (Field field : fields) {
                 doInject(field, beanInstance, definition);
             }
         }
-    }
-
-    protected Method[] extractInitMethods(Class clazz) {
-        List<Method> postConstructMethods = new ArrayList<>(4);
-        List<String> methodNames = new ArrayList<>(4);
-
-        while (clazz != Object.class) {
-            Method[] classMethods = clazz.getDeclaredMethods();
-            for (Method method : classMethods) {
-                for (Class<? extends Annotation> initAnnotation : getConfiguration().getInitMethodAnnotations()) {
-                    if (method.isAnnotationPresent(initAnnotation) && !methodNames.contains(method.getName())) {
-                        postConstructMethods.add(method);
-                        methodNames.add(method.getName());
-                    }
-                }
-            }
-            clazz = clazz.getSuperclass();
-        }
-
-        int size = postConstructMethods.size();
-        return postConstructMethods.toArray(new Method[size]);
-    }
-
-    protected Field[] extractAutowiredFields(Class clazz) {
-        List<Field> autowiredFields = new ArrayList<>();
-
-        while (clazz != Object.class) {
-            Field[] classFields = clazz.getDeclaredFields();
-            for (Field field : classFields) {
-                for (Class<? extends Annotation> autowire : getConfiguration().getAutowiredAnnotations()) {
-                    if (field.isAnnotationPresent(autowire)) {
-                        autowiredFields.add(field);
-                    }
-                }
-            }
-            clazz = clazz.getSuperclass();
-        }
-
-        int size = autowiredFields.size();
-        return autowiredFields.toArray(new Field[size]);
     }
 }

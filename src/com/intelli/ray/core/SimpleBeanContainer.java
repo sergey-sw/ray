@@ -1,6 +1,7 @@
 package com.intelli.ray.core;
 
 import com.intelli.ray.log.ContextLogger;
+import com.intelli.ray.util.Exceptions;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -115,9 +116,16 @@ public class SimpleBeanContainer implements InternalBeanContainer {
     public synchronized void destroyBeans() {
         logger.log("Destroying beans in container : " + this);
         for (BeanDefinition definition : definitionByClass.values()) {
-            if (definition.singletonInstance instanceof Disposable) {
-                logger.log(new Date() + " - Destroying disposable bean " + definition);
-                ((Disposable) definition.singletonInstance).onDestroy();
+            if (definition.destroyMethods != null) {
+                for (Method destroyMethod : definition.destroyMethods) {
+                    logger.log(new Date() + String.format(" - Invoking pre-destroy method %s in bean %s",
+                            destroyMethod.getName(), definition));
+                    try {
+                        destroyMethod.invoke(definition.singletonInstance);
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        logger.log("Exception in pre-destroy method:\n" + Exceptions.toStr(e));
+                    }
+                }
             }
         }
 

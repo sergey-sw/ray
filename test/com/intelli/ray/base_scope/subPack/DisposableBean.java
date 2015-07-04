@@ -1,14 +1,15 @@
 package com.intelli.ray.base_scope.subPack;
 
-import com.intelli.ray.core.Disposable;
 import com.intelli.ray.core.ManagedComponent;
+
+import javax.annotation.PreDestroy;
 
 /**
  * Author: Sergey Saiyan sergey.sova42@gmail.com
  * Date: 30.06.2015 23:45
  */
 @ManagedComponent
-public class DisposableBean implements Disposable {
+public class DisposableBean {
 
     Boolean resourcesReleased;
 
@@ -20,7 +21,7 @@ public class DisposableBean implements Disposable {
         return resourcesReleased;
     }
 
-    @Override
+    @PreDestroy
     public void onDestroy() {
         resourcesReleased = true;
     }

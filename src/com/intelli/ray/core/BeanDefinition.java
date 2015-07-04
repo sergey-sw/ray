@@ -18,26 +18,31 @@ public class BeanDefinition {
     protected final Constructor managedConstructor;
 
     protected final Method[] initMethods;
+    protected final Method[] destroyMethods;
     protected final Field[] autowiredFields;
 
-    public BeanDefinition(String id, Scope scope, Class beanClass, Constructor constructor, Method[] methods, Field[] autowiredFields) {
+    public BeanDefinition(String id, Scope scope, Class beanClass, Constructor constructor,
+                          Method[] initMethods, Method[] destroyMethods, Field[] autowiredFields) {
         this.id = id;
         this.scope = scope;
         this.beanClass = beanClass;
+        this.destroyMethods = destroyMethods;
         this.autowiredFields = autowiredFields;
         this.singletonInstance = null;
         this.managedConstructor = constructor;
-        this.initMethods = methods;
+        this.initMethods = initMethods;
     }
 
-    public BeanDefinition(String id, Scope scope, Class beanClass, Object singletonInstance, Method[] methods, Field[] autowiredFields) {
+    public BeanDefinition(String id, Scope scope, Class beanClass, Object singletonInstance,
+                          Method[] initMethods, Method[] destroyMethods, Field[] autowiredFields) {
         this.id = id;
         this.scope = scope;
         this.beanClass = beanClass;
         this.singletonInstance = singletonInstance;
+        this.destroyMethods = destroyMethods;
         this.autowiredFields = autowiredFields;
         this.managedConstructor = null;
-        this.initMethods = methods;
+        this.initMethods = initMethods;
     }
 
     public void scopeShouldBe(Scope expected) {
@@ -52,10 +57,6 @@ public class BeanDefinition {
 
     public Scope getScope() {
         return scope;
-    }
-
-    public Class getBeanClass() {
-        return beanClass;
     }
 
     //todo
