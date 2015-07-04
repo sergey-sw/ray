@@ -6,9 +6,13 @@ package com.intelli.ray.core;
  */
 public interface InternalBeanContainer extends BeanContainer {
 
+    Iterable<Class> getManagedComponentClasses();
+
     BeanDefinition getBeanDefinition(Class beanClass);
 
     void register(BeanDefinition beanDefinition);
+
+    <T> T getBeanAnyScope(Class<T> beanClass);
 
     void autowireSingletons();
 

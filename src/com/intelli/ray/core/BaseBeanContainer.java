@@ -1,11 +1,8 @@
 package com.intelli.ray.core;
 
 import com.intelli.ray.log.ContextLogger;
-import com.intelli.ray.util.Exceptions;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -14,14 +11,16 @@ import java.util.concurrent.ConcurrentHashMap;
  * Date: 17.05.2015 19:23
  */
 @SuppressWarnings("unchecked")
-public class SimpleBeanContainer implements InternalBeanContainer {
+public class BaseBeanContainer implements InternalBeanContainer {
 
     protected final Map<String, BeanDefinition> definitionByName = new ConcurrentHashMap<>();
     protected final Map<Class, BeanDefinition> definitionByClass = new ConcurrentHashMap<>();
     protected final ContextLogger logger;
+    protected final BeanLifecycleProcessor beanLifecycleProcessor;
 
-    public SimpleBeanContainer(ContextLogger logger) {
+    public BaseBeanContainer(ContextLogger logger) {
         this.logger = logger;
+        this.beanLifecycleProcessor = new BaseBeanLifecycleProcessor(this, logger);
     }
 
     @Override
@@ -71,8 +70,8 @@ public class SimpleBeanContainer implements InternalBeanContainer {
         try {
             //noinspection unchecked
             T prototypeInstance = (T) beanDefinition.managedConstructor.newInstance(constructorParams);
-            doAutowire(prototypeInstance, beanDefinition);
-            invokeInitMethods(beanDefinition, prototypeInstance);
+            beanLifecycleProcessor.autowireFields(prototypeInstance, beanDefinition);
+            beanLifecycleProcessor.invokeInitMethods(prototypeInstance, beanDefinition);
 
             logger.log(new Date() + " - Created prototype instance of class " + beanClass.getSimpleName());
 
@@ -90,8 +89,8 @@ public class SimpleBeanContainer implements InternalBeanContainer {
         try {
             //noinspection unchecked
             T prototypeInstance = (T) beanDefinition.managedConstructor.newInstance(constructorParams);
-            doAutowire(prototypeInstance, beanDefinition);
-            invokeInitMethods(beanDefinition, prototypeInstance);
+            beanLifecycleProcessor.autowireFields(prototypeInstance, beanDefinition);
+            beanLifecycleProcessor.invokeInitMethods(prototypeInstance, beanDefinition);
 
             logger.log(new Date() + " - Created prototype instance with name " + name);
 
@@ -120,11 +119,7 @@ public class SimpleBeanContainer implements InternalBeanContainer {
         for (BeanDefinition definition : getBeanDefinitions()) {
             if (definition.scope == Scope.SINGLETON) {
                 Object beanInstance = definition.singletonInstance;
-                if (definition.autowiredFields != null) {
-                    for (Field autowiredField : definition.autowiredFields) {
-                        autowireField(beanInstance, autowiredField, definition);
-                    }
-                }
+                beanLifecycleProcessor.autowireFields(beanInstance, definition);
             }
         }
     }
@@ -133,7 +128,7 @@ public class SimpleBeanContainer implements InternalBeanContainer {
     public void initSingletons() {
         for (BeanDefinition beanDefinition : getBeanDefinitions()) {
             if (beanDefinition.scope == Scope.SINGLETON) {
-                invokeInitMethods(beanDefinition);
+                beanLifecycleProcessor.invokeInitMethods(beanDefinition.singletonInstance, beanDefinition);
             }
         }
     }
@@ -142,28 +137,24 @@ public class SimpleBeanContainer implements InternalBeanContainer {
     public synchronized void destroyBeans() {
         logger.log("Destroying beans in container : " + this);
         for (BeanDefinition definition : definitionByClass.values()) {
-            if (definition.destroyMethods != null) {
-                for (Method destroyMethod : definition.destroyMethods) {
-                    logger.log(new Date() + String.format(" - Invoking pre-destroy method %s in bean %s",
-                            destroyMethod.getName(), definition));
-                    try {
-                        destroyMethod.invoke(definition.singletonInstance);
-                    } catch (IllegalAccessException | InvocationTargetException e) {
-                        logger.log("Exception in pre-destroy method:\n" + Exceptions.toStr(e));
-                    }
-                }
-            }
+            beanLifecycleProcessor.invokeDestroyMethods(definition.singletonInstance, definition);
         }
 
         definitionByClass.clear();
         definitionByName.clear();
     }
 
+    @Override
+    public Iterable<Class> getManagedComponentClasses() {
+        return definitionByClass.keySet();
+    }
+
     protected Iterable<BeanDefinition> getBeanDefinitions() {
         return definitionByClass.values();
     }
 
-    protected <T> T getBeanAnyScope(Class<T> beanClass) {
+    @Override
+    public <T> T getBeanAnyScope(Class<T> beanClass) {
         BeanDefinition beanDefinition = checkNotNull(definitionByClass.get(beanClass), beanClass);
 
         if (Scope.SINGLETON == beanDefinition.scope) {
@@ -173,74 +164,14 @@ public class SimpleBeanContainer implements InternalBeanContainer {
         }
     }
 
-    protected void invokeInitMethods(BeanDefinition beanDefinition) {
-        invokeInitMethods(beanDefinition, beanDefinition.singletonInstance);
-    }
-
-    protected void invokeInitMethods(BeanDefinition beanDefinition, Object instance) {
-        Method[] initMethods = beanDefinition.initMethods;
-        if (initMethods == null) {
-            return;
-        }
-
-        for (int i = initMethods.length - 1; i >= 0; i--) {
-            Method method = initMethods[i];
-            if (!method.isAccessible()) {
-                method.setAccessible(true);
-            }
-            try {
-                method.invoke(instance);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                throw new BeanInstantiationException("Failed to execute post construct methods of bean " +
-                        beanDefinition.beanClass.getName(), e);
-            }
-        }
-    }
-
     protected <T> T createPrototype(BeanDefinition beanDefinition) {
         try {
             //noinspection unchecked
             T prototypeInstance = (T) beanDefinition.beanClass.newInstance();
-            doAutowire(prototypeInstance, beanDefinition);
-            invokeInitMethods(beanDefinition, prototypeInstance);
+            beanLifecycleProcessor.autowireFields(prototypeInstance, beanDefinition);
+            beanLifecycleProcessor.invokeInitMethods(prototypeInstance, beanDefinition);
             return prototypeInstance;
         } catch (InstantiationException | IllegalAccessException e) {
-            throw new BeanInstantiationException(e);
-        }
-    }
-
-    protected void doAutowire(Object instance, BeanDefinition definition) {
-        Field[] fields = definition.autowiredFields;
-        if (fields == null) {
-            return;
-        }
-
-        for (Field field : fields) {
-            autowireField(instance, field, definition);
-        }
-    }
-
-    protected void autowireField(Object instance, Field field, BeanDefinition definition) {
-        Class fieldClazz = field.getType();
-        BeanDefinition fieldBeanDefinition = definitionByClass.get(fieldClazz);
-        if (fieldBeanDefinition == null) {
-            for (Class clazz : definitionByClass.keySet()) {
-                //noinspection unchecked
-                if (fieldClazz.isAssignableFrom(clazz)) {
-                    fieldBeanDefinition = definitionByClass.get(clazz);
-                    break;
-                }
-            }
-            if (fieldBeanDefinition == null) {
-                throw new BeanInstantiationException("Can not inject property '" + field.getName() + "' in bean " +
-                        definition.beanClass.getName() + ", because property bean class " + fieldClazz.getName()
-                        + " is not present in context.");
-            }
-        }
-        try {
-            if (!field.isAccessible()) field.setAccessible(true);
-            field.set(instance, getBeanAnyScope(fieldBeanDefinition.beanClass));
-        } catch (IllegalAccessException e) {
             throw new BeanInstantiationException(e);
         }
     }

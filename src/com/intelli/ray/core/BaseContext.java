@@ -72,7 +72,7 @@ public abstract class BaseContext implements Context {
         if (beanContainer != null) {
             beanContainer.destroyBeans();
         }
-        beanContainer = new SimpleBeanContainer(logger);
+        beanContainer = new BaseBeanContainer(logger);
         return beanContainer;
     }
 }
