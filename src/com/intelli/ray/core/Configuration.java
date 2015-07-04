@@ -1,12 +1,13 @@
 package com.intelli.ray.core;
 
 import java.lang.annotation.Annotation;
+import java.util.Objects;
 
 /**
  * Configuration allows to encapsulate meta information specific details.
  * In annotation context managed components and their relations are declared with
- * annotations. By default, Ray uses {@link com.intelli.ray.core.ManagedComponent}
- * for components, {@link com.intelli.ray.core.Inject} for relations and so on.
+ * annotations. By default, Ray uses {@link com.intelli.ray.meta.ManagedComponent}
+ * for components, {@link com.intelli.ray.meta.Inject} for relations and so on.
  * These annotations are declared in {@link com.intelli.ray.core.DefaultAnnotationConfiguration}.
  * <p/>
  * However, there is no restriction to use only these annotation for context.
@@ -24,7 +25,7 @@ public interface Configuration {
     /**
      * Method declares what kind of annotations are used to indicate, that class
      * should be present in a context like a managed component.
-     * See {@link com.intelli.ray.core.ManagedComponent}
+     * See {@link com.intelli.ray.meta.ManagedComponent}
      */
     Iterable<Class<? extends Annotation>> getManagedComponentAnnotations();
 
@@ -37,7 +38,7 @@ public interface Configuration {
     /**
      * Method declares what kind of annotations are used to indicate that
      * constructor should be called for component instantiation.
-     * See {@link com.intelli.ray.core.ManagedConstructor}
+     * See {@link com.intelli.ray.meta.ManagedConstructor}
      */
     Iterable<Class<? extends Annotation>> getManagedConstructorAnnotations();
 
@@ -58,7 +59,7 @@ public interface Configuration {
     /**
      * Method declares what kind of annotations are used to indicate that
      * component fields should be autowired with values on initialization phase.
-     * See {@link com.intelli.ray.core.Inject}
+     * See {@link com.intelli.ray.meta.Inject}
      */
     Iterable<Class<? extends Annotation>> getAutowiredAnnotations();
 
@@ -70,8 +71,8 @@ public interface Configuration {
         public final Scope scope;
 
         public NameAndScope(String name, Scope scope) {
-            this.name = name;
-            this.scope = scope;
+            this.name = Objects.requireNonNull(name);
+            this.scope = Objects.requireNonNull(scope);
         }
     }
 

@@ -4,4 +4,3 @@
 - lazy construction
 - scopes
 - bean definition builder
-- @PreDestroy

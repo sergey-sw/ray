@@ -21,4 +21,6 @@ public interface BeanContainer {
     <T> T createPrototype(String name);
 
     <T> T createPrototype(Class<T> beanClass, Object... constructorParams);
+
+    <T> T createPrototype(String name, Object... constructorParams);
 }

@@ -32,17 +32,6 @@ public class SimpleBeanContainer implements InternalBeanContainer {
     }
 
     @Override
-    public <T> T getBeanAnyScope(Class<T> beanClass) {
-        BeanDefinition beanDefinition = checkNotNull(definitionByClass.get(beanClass), beanClass);
-
-        if (Scope.SINGLETON == beanDefinition.scope) {
-            return (T) beanDefinition.singletonInstance;
-        } else {
-            return createPrototype(beanClass);
-        }
-    }
-
-    @Override
     public <T> T getBean(String name) {
         BeanDefinition beanDefinition = checkNotNull(definitionByName.get(name), name);
         beanDefinition.scopeShouldBe(Scope.SINGLETON);
@@ -82,7 +71,7 @@ public class SimpleBeanContainer implements InternalBeanContainer {
         try {
             //noinspection unchecked
             T prototypeInstance = (T) beanDefinition.managedConstructor.newInstance(constructorParams);
-            doPrototypeInject(prototypeInstance, beanDefinition);
+            doAutowire(prototypeInstance, beanDefinition);
             invokeInitMethods(beanDefinition, prototypeInstance);
 
             logger.log(new Date() + " - Created prototype instance of class " + beanClass.getSimpleName());
@@ -94,8 +83,22 @@ public class SimpleBeanContainer implements InternalBeanContainer {
     }
 
     @Override
-    public Iterable<BeanDefinition> getBeanDefinitions() {
-        return definitionByClass.values();
+    public <T> T createPrototype(String name, Object... constructorParams) {
+        BeanDefinition beanDefinition = checkNotNull(definitionByName.get(name), name);
+        beanDefinition.scopeShouldBe(Scope.PROTOTYPE);
+
+        try {
+            //noinspection unchecked
+            T prototypeInstance = (T) beanDefinition.managedConstructor.newInstance(constructorParams);
+            doAutowire(prototypeInstance, beanDefinition);
+            invokeInitMethods(beanDefinition, prototypeInstance);
+
+            logger.log(new Date() + " - Created prototype instance with name " + name);
+
+            return prototypeInstance;
+        } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
+            throw new BeanInstantiationException(e);
+        }
     }
 
     @Override
@@ -110,6 +113,29 @@ public class SimpleBeanContainer implements InternalBeanContainer {
 
         logger.log(String.format(new Date() + " - Registered bean of class %s with scope %s",
                 beanDefinition.beanClass.getName(), beanDefinition.scope.getId()));
+    }
+
+    @Override
+    public void autowireSingletons() {
+        for (BeanDefinition definition : getBeanDefinitions()) {
+            if (definition.scope == Scope.SINGLETON) {
+                Object beanInstance = definition.singletonInstance;
+                if (definition.autowiredFields != null) {
+                    for (Field autowiredField : definition.autowiredFields) {
+                        autowireField(beanInstance, autowiredField, definition);
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void initSingletons() {
+        for (BeanDefinition beanDefinition : getBeanDefinitions()) {
+            if (beanDefinition.scope == Scope.SINGLETON) {
+                invokeInitMethods(beanDefinition);
+            }
+        }
     }
 
     @Override
@@ -133,13 +159,25 @@ public class SimpleBeanContainer implements InternalBeanContainer {
         definitionByName.clear();
     }
 
-    @Override
-    public void invokeInitMethods(BeanDefinition beanDefinition) {
+    protected Iterable<BeanDefinition> getBeanDefinitions() {
+        return definitionByClass.values();
+    }
+
+    protected <T> T getBeanAnyScope(Class<T> beanClass) {
+        BeanDefinition beanDefinition = checkNotNull(definitionByClass.get(beanClass), beanClass);
+
+        if (Scope.SINGLETON == beanDefinition.scope) {
+            return (T) beanDefinition.singletonInstance;
+        } else {
+            return createPrototype(beanClass);
+        }
+    }
+
+    protected void invokeInitMethods(BeanDefinition beanDefinition) {
         invokeInitMethods(beanDefinition, beanDefinition.singletonInstance);
     }
 
-    @Override
-    public void invokeInitMethods(BeanDefinition beanDefinition, Object instance) {
+    protected void invokeInitMethods(BeanDefinition beanDefinition, Object instance) {
         Method[] initMethods = beanDefinition.initMethods;
         if (initMethods == null) {
             return;
@@ -159,25 +197,11 @@ public class SimpleBeanContainer implements InternalBeanContainer {
         }
     }
 
-    protected BeanDefinition checkNotNull(BeanDefinition definition, String id) {
-        if (definition == null) {
-            throw new BeanNotFoundException(id);
-        }
-        return definition;
-    }
-
-    protected BeanDefinition checkNotNull(BeanDefinition definition, Class id) {
-        if (definition == null) {
-            throw new BeanNotFoundException(id);
-        }
-        return definition;
-    }
-
     protected <T> T createPrototype(BeanDefinition beanDefinition) {
         try {
             //noinspection unchecked
             T prototypeInstance = (T) beanDefinition.beanClass.newInstance();
-            doPrototypeInject(prototypeInstance, beanDefinition);
+            doAutowire(prototypeInstance, beanDefinition);
             invokeInitMethods(beanDefinition, prototypeInstance);
             return prototypeInstance;
         } catch (InstantiationException | IllegalAccessException e) {
@@ -185,18 +209,18 @@ public class SimpleBeanContainer implements InternalBeanContainer {
         }
     }
 
-    protected void doPrototypeInject(Object prototype, BeanDefinition definition) {
+    protected void doAutowire(Object instance, BeanDefinition definition) {
         Field[] fields = definition.autowiredFields;
         if (fields == null) {
             return;
         }
 
         for (Field field : fields) {
-            doInject(field, prototype, definition);
+            autowireField(instance, field, definition);
         }
     }
 
-    protected void doInject(Field field, Object beanInstance, BeanDefinition definition) {
+    protected void autowireField(Object instance, Field field, BeanDefinition definition) {
         Class fieldClazz = field.getType();
         BeanDefinition fieldBeanDefinition = definitionByClass.get(fieldClazz);
         if (fieldBeanDefinition == null) {
@@ -215,9 +239,23 @@ public class SimpleBeanContainer implements InternalBeanContainer {
         }
         try {
             if (!field.isAccessible()) field.setAccessible(true);
-            field.set(beanInstance, getBean(fieldBeanDefinition.beanClass));
+            field.set(instance, getBeanAnyScope(fieldBeanDefinition.beanClass));
         } catch (IllegalAccessException e) {
             throw new BeanInstantiationException(e);
         }
+    }
+
+    protected BeanDefinition checkNotNull(BeanDefinition definition, String id) {
+        if (definition == null) {
+            throw new BeanNotFoundException(id);
+        }
+        return definition;
+    }
+
+    protected BeanDefinition checkNotNull(BeanDefinition definition, Class id) {
+        if (definition == null) {
+            throw new BeanNotFoundException(id);
+        }
+        return definition;
     }
 }

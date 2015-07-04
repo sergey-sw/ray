@@ -1,7 +1,7 @@
 package com.intelli.ray.proto_test_scope;
 
-import com.intelli.ray.core.ManagedComponent;
 import com.intelli.ray.core.Scope;
+import com.intelli.ray.meta.ManagedComponent;
 
 /**
  * Author: Sergey42

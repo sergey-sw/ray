@@ -1,6 +1,6 @@
 package com.intelli.ray.base_scope;
 
-import com.intelli.ray.core.ManagedComponent;
+import com.intelli.ray.meta.ManagedComponent;
 
 import javax.annotation.PostConstruct;
 

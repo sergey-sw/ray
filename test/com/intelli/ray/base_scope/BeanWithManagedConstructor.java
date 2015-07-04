@@ -1,8 +1,8 @@
 package com.intelli.ray.base_scope;
 
-import com.intelli.ray.core.ManagedComponent;
-import com.intelli.ray.core.ManagedConstructor;
 import com.intelli.ray.core.Scope;
+import com.intelli.ray.meta.ManagedComponent;
+import com.intelli.ray.meta.ManagedConstructor;
 
 /**
  * Author: Sergey Saiyan sergey.sova42@gmail.com

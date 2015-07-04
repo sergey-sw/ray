@@ -1,8 +1,8 @@
 package com.intelli.ray.base_scope;
 
 import com.intelli.ray.core.Configuration;
-import com.intelli.ray.core.ManagedComponent;
 import com.intelli.ray.core.Scope;
+import com.intelli.ray.meta.ManagedComponent;
 
 import java.lang.annotation.Annotation;
 

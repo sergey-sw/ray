@@ -1,4 +1,6 @@
-package com.intelli.ray.core;
+package com.intelli.ray.meta;
+
+import com.intelli.ray.core.Scope;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

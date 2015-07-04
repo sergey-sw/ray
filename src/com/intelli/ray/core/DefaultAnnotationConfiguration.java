@@ -1,5 +1,9 @@
 package com.intelli.ray.core;
 
+import com.intelli.ray.meta.Inject;
+import com.intelli.ray.meta.ManagedComponent;
+import com.intelli.ray.meta.ManagedConstructor;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.lang.annotation.Annotation;

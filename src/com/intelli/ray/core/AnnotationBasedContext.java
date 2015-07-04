@@ -74,18 +74,4 @@ public class AnnotationBasedContext extends BaseConfigurableContext {
             beanContainer.register(definition);
         }
     }
-
-    @Override
-    protected void injectSingletonDependencies() {
-        for (BeanDefinition definition : beanContainer.getBeanDefinitions()) {
-            if (definition.scope == Scope.PROTOTYPE) continue;
-
-            Object beanInstance = definition.singletonInstance;
-            Field[] fields = getFieldsAnnotatedWith(beanInstance.getClass(), getConfiguration().getAutowiredAnnotations());
-
-            for (Field field : fields) {
-                doInject(field, beanInstance, definition);
-            }
-        }
-    }
 }

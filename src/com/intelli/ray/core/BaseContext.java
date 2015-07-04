@@ -3,8 +3,6 @@ package com.intelli.ray.core;
 import com.intelli.ray.log.ContextLogger;
 import com.intelli.ray.log.LoggerRegistry;
 
-import java.lang.reflect.Field;
-
 /**
  * Author: Sergey Saiyan sergey.sova42@gmail.com
  * Date: 02.07.2015 22:55
@@ -20,8 +18,6 @@ public abstract class BaseContext implements Context {
     protected final Object lifecycleMonitor = new Object();
 
     protected abstract void registerBeanDefinitions();
-
-    protected abstract void injectSingletonDependencies();
 
     @Override
     public BeanContainer getBeanContainer() {
@@ -47,8 +43,8 @@ public abstract class BaseContext implements Context {
             createBeanContainer();
             try {
                 registerBeanDefinitions();
-                injectSingletonDependencies();
-                invokeInitMethods();
+                beanContainer.autowireSingletons();
+                beanContainer.initSingletons();
 
                 started = true;
             } catch (BeanInstantiationException e) {
@@ -78,30 +74,5 @@ public abstract class BaseContext implements Context {
         }
         beanContainer = new SimpleBeanContainer(logger);
         return beanContainer;
-    }
-
-    @SuppressWarnings("unchecked")
-    protected void doInject(Field field, Object beanInstance, BeanDefinition definition) {
-        Class fieldClazz = field.getType();
-        BeanDefinition fieldBeanDefinition = beanContainer.getBeanDefinition(fieldClazz);
-        if (fieldBeanDefinition == null) {
-            throw new BeanInstantiationException("Can not inject property '" + field.getName() + "' in bean " +
-                    definition.beanClass.getName() + ", because property bean class " + fieldClazz.getName()
-                    + " is not present in context.");
-        }
-        try {
-            if (!field.isAccessible()) field.setAccessible(true);
-            field.set(beanInstance, beanContainer.getBeanAnyScope(fieldBeanDefinition.beanClass));
-        } catch (IllegalAccessException e) {
-            throw new BeanInstantiationException(e);
-        }
-    }
-
-    protected void invokeInitMethods() {
-        for (BeanDefinition beanDefinition : beanContainer.getBeanDefinitions()) {
-            if (beanDefinition.scope == Scope.SINGLETON) {
-                beanContainer.invokeInitMethods(beanDefinition);
-            }
-        }
     }
 }

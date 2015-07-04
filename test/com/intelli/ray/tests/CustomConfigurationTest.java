@@ -3,7 +3,11 @@ package com.intelli.ray.tests;
 import com.intelli.ray.base_scope.CustomBean;
 import com.intelli.ray.base_scope.MBEAN;
 import com.intelli.ray.base_scope.WIRE;
-import com.intelli.ray.core.*;
+import com.intelli.ray.core.AnnotationBasedContext;
+import com.intelli.ray.core.ConfigurableContext;
+import com.intelli.ray.core.Configuration;
+import com.intelli.ray.core.DefaultAnnotationConfiguration;
+import com.intelli.ray.meta.ManagedComponent;
 import junit.framework.TestCase;
 
 import java.lang.annotation.Annotation;
