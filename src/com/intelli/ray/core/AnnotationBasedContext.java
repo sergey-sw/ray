@@ -1,7 +1,9 @@
 package com.intelli.ray.core;
 
 import com.intelli.ray.meta.InterfaceAudience;
+import com.intelli.ray.reflection.ReflectionException;
 import com.intelli.ray.reflection.Scanner;
+import com.intelli.ray.util.Exceptions;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -38,6 +40,13 @@ public class AnnotationBasedContext extends BaseConfigurableContext {
     @Override
     protected void registerBeanDefinitions() {
         Scanner scanner = new Scanner(logger, scanLocations);
+        try {
+            scanner.scan();
+        } catch (ReflectionException e) {
+            logger.error(Exceptions.toStr("Failed to scan locations:", e));
+            throw e;
+        }
+
         Configuration configuration = getConfiguration();
         Iterable<Class<? extends Annotation>> annotations = configuration.getManagedComponentAnnotations();
         Map<Class, Class<? extends Annotation>> classMap = getTypesAnnotatedWith(scanner.getClasses(), annotations);

@@ -39,9 +39,9 @@ public class BaseBeanLifecycleProcessor implements BeanLifecycleProcessor {
                         method.getName(), beanDefinition));
                 method.invoke(instance);
             } catch (IllegalAccessException | InvocationTargetException e) {
-                logger.error(Exceptions.toStr(e));
-                throw new BeanInstantiationException("Failed to execute post construct method of bean " +
-                        beanDefinition.beanClass.getName(), e);
+                String msg = "Failed to execute post construct method of bean " + beanDefinition.beanClass.getName();
+                logger.error(Exceptions.toStr(msg, e));
+                throw new BeanInstantiationException(msg, e);
             }
         }
     }
@@ -55,7 +55,7 @@ public class BaseBeanLifecycleProcessor implements BeanLifecycleProcessor {
                 try {
                     destroyMethod.invoke(instance);
                 } catch (IllegalAccessException | InvocationTargetException e) {
-                    logger.error("Exception in pre-destroy method:\n" + Exceptions.toStr(e));
+                    logger.error(Exceptions.toStr("Exception in pre-destroy method:", e));
                 }
             }
         }

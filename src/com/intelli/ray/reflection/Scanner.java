@@ -24,13 +24,17 @@ public class Scanner {
     private static List<UrlType> defaultUrlTypes = Arrays.<UrlType>asList(DefaultUrlTypes.values());
 
     private ContextLogger logger;
+    private String[] locations;
     private AnyFilter filter;
     private Set<Class> classes = new HashSet<>();
 
     public Scanner(ContextLogger logger, String... locations) {
         this.logger = logger;
+        this.locations = locations;
         this.filter = new AnyFilter(locations);
+    }
 
+    public void scan() {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         Set<URL> allUrls = new HashSet<>();
         for (String location : locations) {
@@ -56,7 +60,7 @@ public class Scanner {
                         name = input.substring(0, input.lastIndexOf(".class"));
                         classes.add(Class.forName(name));
                     } catch (ClassNotFoundException e) {
-                        logger.warn("Could not load class " + name + "\n" + Exceptions.toStr(e));
+                        logger.warn(Exceptions.toStr("Could not load class " + name, e));
                     }
                 }
             }
@@ -81,7 +85,7 @@ public class Scanner {
                 }
             }
         } catch (IOException e) {
-            logger.warn("Error getting resources for " + resourceName + "\n" + Exceptions.toStr(e));
+            logger.warn(Exceptions.toStr("Error getting resources for " + resourceName, e));
         }
         return distinctUrls(result);
     }
@@ -130,8 +134,8 @@ public class Scanner {
                     if (dir != null) return dir;
                 }
             } catch (Throwable e) {
-                logger.warn("Could not create Dir using " + type + " from url " + url.toExternalForm() + ". " +
-                        "Skipping.\n" + Exceptions.toStr(e));
+                logger.warn(Exceptions.toStr("Could not create Dir using " + type + " from url " + url.toExternalForm() + ". " +
+                        "Skipping.", e));
             }
         }
 

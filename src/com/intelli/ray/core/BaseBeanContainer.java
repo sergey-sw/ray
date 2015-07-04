@@ -83,7 +83,7 @@ public class BaseBeanContainer implements InternalBeanContainer {
 
             return prototypeInstance;
         } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
-            logger.error(Exceptions.toStr(e));
+            logger.error(Exceptions.toStr("Failed to create a prototype of class: " + beanClass.getName(), e));
             throw new BeanInstantiationException(e);
         }
     }
@@ -103,7 +103,7 @@ public class BaseBeanContainer implements InternalBeanContainer {
 
             return prototypeInstance;
         } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
-            logger.error(Exceptions.toStr(e));
+            logger.error(Exceptions.toStr("Failed to create a prototype with name: " + name, e));
             throw new BeanInstantiationException(e);
         }
     }
