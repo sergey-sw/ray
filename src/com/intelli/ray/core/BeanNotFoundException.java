@@ -1,5 +1,7 @@
 package com.intelli.ray.core;
 
+import com.intelli.ray.meta.InterfaceAudience;
+
 /**
  * Exception indicates that requested component is not found in application context.
  * This may be caused by incorrect component declaration or wrong context dependencies.
@@ -7,6 +9,7 @@ package com.intelli.ray.core;
  * Author: Sergey42
  * Date: 18.05.14 16:11
  */
+@InterfaceAudience.Public
 public class BeanNotFoundException extends IllegalArgumentException {
 
     String msg;

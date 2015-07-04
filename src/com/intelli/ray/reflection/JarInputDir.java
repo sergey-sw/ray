@@ -1,5 +1,7 @@
 package com.intelli.ray.reflection;
 
+import com.intelli.ray.meta.InterfaceAudience;
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.Iterator;
@@ -10,6 +12,7 @@ import java.util.zip.ZipEntry;
  * Author: Sergey Saiyan sergey.sova42@gmail.com
  * Date: 30.06.2015 21:59
  */
+@InterfaceAudience.Private
 public class JarInputDir implements Scanner.Dir {
     private final URL url;
     JarInputStream jarInputStream;

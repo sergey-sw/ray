@@ -1,5 +1,7 @@
 package com.intelli.ray.core;
 
+import com.intelli.ray.meta.InterfaceAudience;
+
 import java.lang.annotation.Annotation;
 import java.util.Objects;
 
@@ -20,6 +22,7 @@ import java.util.Objects;
  * Author: Sergey Saiyan sergey.sova42@gmail.com
  * Date: 04.07.2015 12:00
  */
+@InterfaceAudience.Public
 public interface Configuration {
 
     /**

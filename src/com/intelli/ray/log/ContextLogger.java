@@ -1,11 +1,14 @@
 package com.intelli.ray.log;
 
+import com.intelli.ray.meta.InterfaceAudience;
+
 import java.util.Date;
 
 /**
  * Author: Sergey Saiyan sergey.sova42@gmail.com
  * Date: 30.06.2015 18:29
  */
+@InterfaceAudience.Development
 public class ContextLogger {
 
     protected LoggerRegistryImpl loggerRegistry = new LoggerRegistryImpl();

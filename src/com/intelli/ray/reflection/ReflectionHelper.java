@@ -1,5 +1,7 @@
 package com.intelli.ray.reflection;
 
+import com.intelli.ray.meta.InterfaceAudience;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -13,6 +15,7 @@ import java.util.Map;
  * Author: Sergey42
  * Date: 24.05.14 21:18
  */
+@InterfaceAudience.Development
 public class ReflectionHelper {
 
     public static Map<Class, Class<? extends Annotation>> getTypesAnnotatedWith(

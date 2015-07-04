@@ -1,5 +1,7 @@
 package com.intelli.ray.log;
 
+import com.intelli.ray.meta.InterfaceAudience;
+
 /**
  * Interface for context logs consuming.
  * Debug level is used for minor events, like invoking lifecycle methods
@@ -11,6 +13,7 @@ package com.intelli.ray.log;
  * Author: Sergey Saiyan sergey.sova42@gmail.com
  * Date: 30.06.2015 18:12
  */
+@InterfaceAudience.Public
 public interface LogConsumer {
 
     void debug(String msg);

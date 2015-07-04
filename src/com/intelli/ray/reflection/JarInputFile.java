@@ -1,5 +1,7 @@
 package com.intelli.ray.reflection;
 
+import com.intelli.ray.meta.InterfaceAudience;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.ZipEntry;
@@ -8,6 +10,7 @@ import java.util.zip.ZipEntry;
  * Author: Sergey Saiyan sergey.sova42@gmail.com
  * Date: 30.06.2015 21:58
  */
+@InterfaceAudience.Private
 public class JarInputFile implements Scanner.File {
     private final ZipEntry entry;
     private final JarInputDir jarInputDir;

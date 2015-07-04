@@ -1,5 +1,7 @@
 package com.intelli.ray.core;
 
+import com.intelli.ray.meta.InterfaceAudience;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -9,6 +11,7 @@ import java.util.Objects;
  * Author: Sergey42
  * Date: 17.05.2015 19:24
  */
+@InterfaceAudience.Development
 public class BeanDefinition {
 
     protected final String id;

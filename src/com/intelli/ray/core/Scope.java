@@ -1,9 +1,12 @@
 package com.intelli.ray.core;
 
+import com.intelli.ray.meta.InterfaceAudience;
+
 /**
  * Author: Sergey42
  * Date: 16.11.13 17:02
  */
+@InterfaceAudience.Public
 public enum Scope {
     SINGLETON("singleton"),
     PROTOTYPE("prototype");

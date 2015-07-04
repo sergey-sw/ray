@@ -1,5 +1,6 @@
 package com.intelli.ray.core;
 
+import com.intelli.ray.meta.InterfaceAudience;
 import com.intelli.ray.reflection.Scanner;
 
 import java.lang.annotation.Annotation;
@@ -14,6 +15,7 @@ import static com.intelli.ray.reflection.ReflectionHelper.*;
  * Author: Sergey42
  * Date: 14.11.13 21:11
  */
+@InterfaceAudience.Public
 public class AnnotationBasedContext extends BaseConfigurableContext {
 
     protected String[] scanLocations;

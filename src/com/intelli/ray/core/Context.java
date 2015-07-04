@@ -1,6 +1,7 @@
 package com.intelli.ray.core;
 
 import com.intelli.ray.log.LoggerRegistry;
+import com.intelli.ray.meta.InterfaceAudience;
 
 /**
  * Context represents a scope of related application components.
@@ -8,6 +9,7 @@ import com.intelli.ray.log.LoggerRegistry;
  * Author: Sergey42
  * Date: 21.12.2014 20:58
  */
+@InterfaceAudience.Public
 public interface Context {
 
     /**

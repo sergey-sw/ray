@@ -2,11 +2,13 @@ package com.intelli.ray.core;
 
 import com.intelli.ray.log.ContextLogger;
 import com.intelli.ray.log.LoggerRegistry;
+import com.intelli.ray.meta.InterfaceAudience;
 
 /**
  * Author: Sergey Saiyan sergey.sova42@gmail.com
  * Date: 02.07.2015 22:55
  */
+@InterfaceAudience.Development
 public abstract class BaseContext implements Context {
 
     protected final ContextLogger logger = new ContextLogger();

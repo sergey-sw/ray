@@ -11,6 +11,7 @@ import java.lang.annotation.Target;
  * Author: Sergey42
  * Date: 14.11.13 21:09
  */
+@InterfaceAudience.Public
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ManagedComponent {

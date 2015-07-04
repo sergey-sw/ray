@@ -1,5 +1,7 @@
 package com.intelli.ray.reflection;
 
+import com.intelli.ray.meta.InterfaceAudience;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -9,6 +11,7 @@ import java.io.InputStream;
  * Author: Sergey Saiyan sergey.sova42@gmail.com
  * Date: 30.06.2015 21:42
  */
+@InterfaceAudience.Private
 public class SystemFile implements Scanner.File {
 
     private final SystemDir root;

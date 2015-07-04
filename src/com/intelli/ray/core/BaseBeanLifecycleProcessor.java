@@ -1,6 +1,7 @@
 package com.intelli.ray.core;
 
 import com.intelli.ray.log.ContextLogger;
+import com.intelli.ray.meta.InterfaceAudience;
 import com.intelli.ray.util.Exceptions;
 
 import java.lang.reflect.Field;
@@ -8,9 +9,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
+ * Base implementation for bean lifecycle processor
+ * <p/>
  * Author: Sergey Saiyan sergey.sova42@gmail.com
  * Date: 04.07.2015 19:14
  */
+@InterfaceAudience.Private
 public class BaseBeanLifecycleProcessor implements BeanLifecycleProcessor {
 
     private final InternalBeanContainer beanContainer;

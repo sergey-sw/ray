@@ -1,5 +1,7 @@
 package com.intelli.ray.core;
 
+import com.intelli.ray.meta.InterfaceAudience;
+
 /**
  * Interface that encapsulate the process of component creation,
  * initialization (autowiring and init methods) and destruction;
@@ -7,6 +9,7 @@ package com.intelli.ray.core;
  * Author: Sergey Saiyan sergey.sova42@gmail.com
  * Date: 04.07.2015 19:12
  */
+@InterfaceAudience.Development
 public interface BeanLifecycleProcessor {
 
     /**

@@ -1,5 +1,7 @@
 package com.intelli.ray.reflection;
 
+import com.intelli.ray.meta.InterfaceAudience;
+
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -10,6 +12,7 @@ import java.util.zip.ZipEntry;
  * Author: Sergey Saiyan sergey.sova42@gmail.com
  * Date: 30.06.2015 21:51
  */
+@InterfaceAudience.Private
 public class ZipDir implements Scanner.Dir {
 
     final java.util.zip.ZipFile jarFile;

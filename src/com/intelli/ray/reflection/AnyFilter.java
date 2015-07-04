@@ -1,5 +1,7 @@
 package com.intelli.ray.reflection;
 
+import com.intelli.ray.meta.InterfaceAudience;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -8,6 +10,7 @@ import java.util.regex.Pattern;
  * Author: Sergey Saiyan sergey.sova42@gmail.com
  * Date: 30.06.2015 22:09
  */
+@InterfaceAudience.Private
 public class AnyFilter {
 
     public AnyFilter(String[] locations) {

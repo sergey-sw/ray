@@ -1,6 +1,7 @@
 package com.intelli.ray.core;
 
 import com.intelli.ray.meta.Inject;
+import com.intelli.ray.meta.InterfaceAudience;
 import com.intelli.ray.meta.ManagedComponent;
 import com.intelli.ray.meta.ManagedConstructor;
 
@@ -13,6 +14,7 @@ import java.util.Arrays;
  * Author: Sergey Saiyan sergey.sova42@gmail.com
  * Date: 04.07.2015 12:07
  */
+@InterfaceAudience.Development
 public class DefaultAnnotationConfiguration implements Configuration {
 
     private final NameAndScopeExtractor nameAndScopeExtractor = new NameAndScopeExtractor() {

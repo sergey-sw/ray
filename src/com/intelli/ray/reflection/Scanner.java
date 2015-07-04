@@ -1,6 +1,7 @@
 package com.intelli.ray.reflection;
 
 import com.intelli.ray.log.ContextLogger;
+import com.intelli.ray.meta.InterfaceAudience;
 import com.intelli.ray.util.Exceptions;
 
 import java.io.IOException;
@@ -17,6 +18,7 @@ import java.util.jar.JarFile;
  * Author: Sergey Saiyan sergey.sova42@gmail.com
  * Date: 30.06.2015 21:02
  */
+@InterfaceAudience.Private
 public class Scanner {
 
     private static List<UrlType> defaultUrlTypes = Arrays.<UrlType>asList(DefaultUrlTypes.values());

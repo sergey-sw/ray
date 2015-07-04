@@ -1,6 +1,7 @@
 package com.intelli.ray.core;
 
 import com.intelli.ray.log.ContextLogger;
+import com.intelli.ray.meta.InterfaceAudience;
 import com.intelli.ray.util.Exceptions;
 
 import java.lang.reflect.InvocationTargetException;
@@ -14,6 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Author: Sergey42
  * Date: 17.05.2015 19:23
  */
+@InterfaceAudience.Development
 @SuppressWarnings("unchecked")
 public class BaseBeanContainer implements InternalBeanContainer {
 

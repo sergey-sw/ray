@@ -1,5 +1,7 @@
 package com.intelli.ray.core;
 
+import com.intelli.ray.meta.InterfaceAudience;
+
 import java.util.Collection;
 
 /**
@@ -8,6 +10,7 @@ import java.util.Collection;
  * Author: Sergey42
  * Date: 17.05.2015 17:24
  */
+@InterfaceAudience.Public
 public interface BeanContainer {
 
     <T> T getBean(Class<T> beanClass);
