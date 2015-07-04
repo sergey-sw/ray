@@ -27,7 +27,7 @@ public class CustomConfigurationTest extends TestCase {
         assertNotNull(bean.getSingle());
 
         for (Class<? extends Annotation> a : context.getConfiguration().getManagedConstructorAnnotations()) {
-            System.out.println(a);
+            System.out.println("Managed const annotation: " + a);
         }
     }
 

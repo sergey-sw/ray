@@ -29,14 +29,14 @@ public interface Context {
     void destroy();
 
     /**
-     * Returns the instance of BeanContainer, associated with
-     * the current context.
+     * Returns the instance of BeanContainer, associated with the current context.
+     * See {@link com.intelli.ray.core.BeanContainer}
      */
     BeanContainer getBeanContainer();
 
     /**
-     * Returns the instance of LoggerRegistry, associated with
-     * the current context.
+     * Returns the instance of LoggerRegistry, associated with the current context.
+     * See {@link com.intelli.ray.log.LoggerRegistry}
      */
     LoggerRegistry getLoggerRegistry();
 }

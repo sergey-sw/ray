@@ -39,7 +39,7 @@ public class AnnotationBasedContext extends BaseConfigurableContext {
         Configuration configuration = getConfiguration();
         Iterable<Class<? extends Annotation>> annotations = configuration.getManagedComponentAnnotations();
         Map<Class, Class<? extends Annotation>> classMap = getTypesAnnotatedWith(scanner.getClasses(), annotations);
-        Configuration.NameAndScopeExtractor nameAndScopeExtractor = getConfiguration().getNameAndScopeExtractor();
+        Configuration.NameAndScopeExtractor nameAndScopeExtractor = configuration.getNameAndScopeExtractor();
 
         for (Map.Entry<Class, Class<? extends Annotation>> entry : classMap.entrySet()) {
             Class clazz = entry.getKey();
@@ -58,14 +58,16 @@ public class AnnotationBasedContext extends BaseConfigurableContext {
             }
 
             BeanDefinition definition;
-            Method[] initMethods = getUniqueMethodsAnnotatedWith(clazz, getConfiguration().getInitMethodAnnotations());
-            Method[] destroyMethods = getUniqueMethodsAnnotatedWith(clazz, getConfiguration().getDestroyMethodAnnotations());
-            Field[] autowiredFields = getFieldsAnnotatedWith(clazz, getConfiguration().getAutowiredAnnotations());
+            Method[] initMethods = getUniqueMethodsAnnotatedWith(clazz, configuration.getInitMethodAnnotations());
+            Method[] destroyMethods = getUniqueMethodsAnnotatedWith(clazz, configuration.getDestroyMethodAnnotations());
+            Field[] autowiredFields = getFieldsAnnotatedWith(clazz, configuration.getAutowiredAnnotations());
             if (constructor != null) {
-                definition = new BeanDefinition(beanId, scope, clazz, constructor, initMethods, destroyMethods, autowiredFields);
+                definition = new BeanDefinition(beanId, scope, clazz, constructor, initMethods,
+                        destroyMethods, autowiredFields);
             } else {
                 try {
-                    definition = new BeanDefinition(beanId, scope, clazz, clazz.newInstance(), initMethods, destroyMethods, autowiredFields);
+                    definition = new BeanDefinition(beanId, scope, clazz, clazz.newInstance(), initMethods,
+                            destroyMethods, autowiredFields);
                 } catch (InstantiationException | IllegalAccessException e) {
                     throw new BeanInstantiationException(e);
                 }

@@ -1,9 +1,13 @@
 package com.intelli.ray.core;
 
 import com.intelli.ray.log.ContextLogger;
+import com.intelli.ray.util.Exceptions;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -26,14 +30,14 @@ public class BaseBeanContainer implements InternalBeanContainer {
     @Override
     public <T> T getBean(Class<T> beanClass) {
         BeanDefinition beanDefinition = checkNotNull(definitionByClass.get(beanClass), beanClass);
-        beanDefinition.scopeShouldBe(Scope.SINGLETON);
+        validateScope(beanDefinition, Scope.SINGLETON);
         return (T) beanDefinition.singletonInstance;
     }
 
     @Override
     public <T> T getBean(String name) {
         BeanDefinition beanDefinition = checkNotNull(definitionByName.get(name), name);
-        beanDefinition.scopeShouldBe(Scope.SINGLETON);
+        validateScope(beanDefinition, Scope.SINGLETON);
         return (T) beanDefinition.singletonInstance;
     }
 
@@ -51,21 +55,21 @@ public class BaseBeanContainer implements InternalBeanContainer {
     @Override
     public <T> T createPrototype(Class<T> beanClass) {
         BeanDefinition beanDefinition = checkNotNull(definitionByClass.get(beanClass), beanClass);
-        beanDefinition.scopeShouldBe(Scope.PROTOTYPE);
+        validateScope(beanDefinition, Scope.PROTOTYPE);
         return createPrototype(beanDefinition);
     }
 
     @Override
     public <T> T createPrototype(String name) {
         BeanDefinition beanDefinition = checkNotNull(definitionByName.get(name), name);
-        beanDefinition.scopeShouldBe(Scope.PROTOTYPE);
+        validateScope(beanDefinition, Scope.PROTOTYPE);
         return createPrototype(beanDefinition);
     }
 
     @Override
     public <T> T createPrototype(Class<T> beanClass, Object... constructorParams) {
         BeanDefinition beanDefinition = checkNotNull(definitionByClass.get(beanClass), beanClass);
-        beanDefinition.scopeShouldBe(Scope.PROTOTYPE);
+        validateScope(beanDefinition, Scope.PROTOTYPE);
 
         try {
             //noinspection unchecked
@@ -73,10 +77,11 @@ public class BaseBeanContainer implements InternalBeanContainer {
             beanLifecycleProcessor.autowireFields(prototypeInstance, beanDefinition);
             beanLifecycleProcessor.invokeInitMethods(prototypeInstance, beanDefinition);
 
-            logger.log(new Date() + " - Created prototype instance of class " + beanClass.getSimpleName());
+            logger.debug("Created prototype instance of class " + beanClass.getSimpleName());
 
             return prototypeInstance;
         } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
+            logger.error(Exceptions.toStr(e));
             throw new BeanInstantiationException(e);
         }
     }
@@ -84,7 +89,7 @@ public class BaseBeanContainer implements InternalBeanContainer {
     @Override
     public <T> T createPrototype(String name, Object... constructorParams) {
         BeanDefinition beanDefinition = checkNotNull(definitionByName.get(name), name);
-        beanDefinition.scopeShouldBe(Scope.PROTOTYPE);
+        validateScope(beanDefinition, Scope.PROTOTYPE);
 
         try {
             //noinspection unchecked
@@ -92,10 +97,11 @@ public class BaseBeanContainer implements InternalBeanContainer {
             beanLifecycleProcessor.autowireFields(prototypeInstance, beanDefinition);
             beanLifecycleProcessor.invokeInitMethods(prototypeInstance, beanDefinition);
 
-            logger.log(new Date() + " - Created prototype instance with name " + name);
+            logger.debug("Created prototype instance with name " + name);
 
             return prototypeInstance;
         } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
+            logger.error(Exceptions.toStr(e));
             throw new BeanInstantiationException(e);
         }
     }
@@ -110,7 +116,7 @@ public class BaseBeanContainer implements InternalBeanContainer {
         definitionByName.put(beanDefinition.id, beanDefinition);
         definitionByClass.put(beanDefinition.beanClass, beanDefinition);
 
-        logger.log(String.format(new Date() + " - Registered bean of class %s with scope %s",
+        logger.info(String.format("Registered bean of class %s with scope %s",
                 beanDefinition.beanClass.getName(), beanDefinition.scope.getId()));
     }
 
@@ -135,7 +141,7 @@ public class BaseBeanContainer implements InternalBeanContainer {
 
     @Override
     public synchronized void destroyBeans() {
-        logger.log("Destroying beans in container : " + this);
+        logger.info("Destroying beans in container : " + this);
         for (BeanDefinition definition : definitionByClass.values()) {
             beanLifecycleProcessor.invokeDestroyMethods(definition.singletonInstance, definition);
         }
@@ -178,6 +184,7 @@ public class BaseBeanContainer implements InternalBeanContainer {
 
     protected BeanDefinition checkNotNull(BeanDefinition definition, String id) {
         if (definition == null) {
+            logger.error("Bean not found: " + id);
             throw new BeanNotFoundException(id);
         }
         return definition;
@@ -185,8 +192,17 @@ public class BaseBeanContainer implements InternalBeanContainer {
 
     protected BeanDefinition checkNotNull(BeanDefinition definition, Class id) {
         if (definition == null) {
+            logger.error("Bean not found : " + id.getName());
             throw new BeanNotFoundException(id);
         }
         return definition;
+    }
+
+    protected void validateScope(BeanDefinition definition, Scope expected) {
+        if (definition.scope != expected) {
+            String msg = BeanInstantiationException.getScopeValidationMessage(definition, expected);
+            logger.error(msg);
+            throw new BeanInstantiationException(msg);
+        }
     }
 }

@@ -4,7 +4,7 @@ package com.intelli.ray.core;
  * Exception indicated, that instantiation of managed component failed for some reason.
  * This can happen for many reasons, for example because of inaccessible class constructors or
  * wrong scope declarations.
- *
+ * <p/>
  * Author: Sergey42
  * Date: 16.11.13 20:27
  */
@@ -24,7 +24,7 @@ public class BeanInstantiationException extends RuntimeException {
         super(cause);
     }
 
-    public BeanInstantiationException(BeanDefinition definition, Scope expected) {
-        super(String.format(SCOPE_PATTERN, definition, expected, definition.getScope()));
+    public static String getScopeValidationMessage(BeanDefinition definition, Scope expected) {
+        return String.format(SCOPE_PATTERN, definition, expected, definition.getScope());
     }
 }

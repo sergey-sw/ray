@@ -3,7 +3,7 @@ package com.intelli.ray.core;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * Author: Sergey42
@@ -23,32 +23,28 @@ public class BeanDefinition {
 
     public BeanDefinition(String id, Scope scope, Class beanClass, Constructor constructor,
                           Method[] initMethods, Method[] destroyMethods, Field[] autowiredFields) {
-        this.id = id;
-        this.scope = scope;
-        this.beanClass = beanClass;
-        this.destroyMethods = destroyMethods;
-        this.autowiredFields = autowiredFields;
+        this.id = Objects.requireNonNull(id);
+        this.scope = Objects.requireNonNull(scope);
+        this.beanClass = Objects.requireNonNull(beanClass);
+        this.destroyMethods = Objects.requireNonNull(destroyMethods);
+        this.autowiredFields = Objects.requireNonNull(autowiredFields);
+        this.initMethods = Objects.requireNonNull(initMethods);
+        this.managedConstructor = Objects.requireNonNull(constructor);
+
         this.singletonInstance = null;
-        this.managedConstructor = constructor;
-        this.initMethods = initMethods;
     }
 
     public BeanDefinition(String id, Scope scope, Class beanClass, Object singletonInstance,
                           Method[] initMethods, Method[] destroyMethods, Field[] autowiredFields) {
-        this.id = id;
-        this.scope = scope;
-        this.beanClass = beanClass;
-        this.singletonInstance = singletonInstance;
-        this.destroyMethods = destroyMethods;
-        this.autowiredFields = autowiredFields;
-        this.managedConstructor = null;
-        this.initMethods = initMethods;
-    }
+        this.id = Objects.requireNonNull(id);
+        this.scope = Objects.requireNonNull(scope);
+        this.beanClass = Objects.requireNonNull(beanClass);
+        this.destroyMethods = Objects.requireNonNull(destroyMethods);
+        this.autowiredFields = Objects.requireNonNull(autowiredFields);
+        this.initMethods = Objects.requireNonNull(initMethods);
+        this.singletonInstance = Objects.requireNonNull(singletonInstance);
 
-    public void scopeShouldBe(Scope expected) {
-        if (scope != expected) {
-            throw new BeanInstantiationException(this, expected);
-        }
+        this.managedConstructor = null;
     }
 
     public String getId() {
@@ -59,17 +55,12 @@ public class BeanDefinition {
         return scope;
     }
 
-    //todo
     @Override
     public String toString() {
         return "BeanDefinition{" +
                 "id='" + id + '\'' +
                 ", scope=" + scope +
-                ", beanClass=" + beanClass +
-                ", singletonInstance=" + singletonInstance +
-                ", managedConstructor=" + managedConstructor +
-                ", initMethods=" + Arrays.toString(initMethods) +
-                ", autowiredFields=" + Arrays.toString(autowiredFields) +
+                ", beanClass=" + beanClass.getName() +
                 '}';
     }
 }

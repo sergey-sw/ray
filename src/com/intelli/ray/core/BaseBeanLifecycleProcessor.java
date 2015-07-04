@@ -6,7 +6,6 @@ import com.intelli.ray.util.Exceptions;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Date;
 
 /**
  * Author: Sergey Saiyan sergey.sova42@gmail.com
@@ -25,9 +24,6 @@ public class BaseBeanLifecycleProcessor implements BeanLifecycleProcessor {
     @Override
     public void invokeInitMethods(Object instance, BeanDefinition beanDefinition) {
         Method[] initMethods = beanDefinition.initMethods;
-        if (initMethods == null) {
-            return;
-        }
 
         for (int i = initMethods.length - 1; i >= 0; i--) {
             Method method = initMethods[i];
@@ -35,10 +31,11 @@ public class BaseBeanLifecycleProcessor implements BeanLifecycleProcessor {
                 method.setAccessible(true);
             }
             try {
-                logger.log(new Date() + String.format(" - Invoking init method %s in bean %s",
+                logger.debug(String.format("Invoking init method %s in bean %s",
                         method.getName(), beanDefinition));
                 method.invoke(instance);
             } catch (IllegalAccessException | InvocationTargetException e) {
+                logger.error(Exceptions.toStr(e));
                 throw new BeanInstantiationException("Failed to execute post construct method of bean " +
                         beanDefinition.beanClass.getName(), e);
             }
@@ -49,12 +46,12 @@ public class BaseBeanLifecycleProcessor implements BeanLifecycleProcessor {
     public void invokeDestroyMethods(Object instance, BeanDefinition definition) {
         if (definition.destroyMethods != null) {
             for (Method destroyMethod : definition.destroyMethods) {
-                logger.log(new Date() + String.format(" - Invoking pre-destroy method %s in bean %s",
+                logger.debug(String.format("Invoking pre-destroy method %s in bean %s",
                         destroyMethod.getName(), definition));
                 try {
                     destroyMethod.invoke(instance);
                 } catch (IllegalAccessException | InvocationTargetException e) {
-                    logger.log("Exception in pre-destroy method:\n" + Exceptions.toStr(e));
+                    logger.error("Exception in pre-destroy method:\n" + Exceptions.toStr(e));
                 }
             }
         }
@@ -63,9 +60,6 @@ public class BaseBeanLifecycleProcessor implements BeanLifecycleProcessor {
     @Override
     public void autowireFields(Object instance, BeanDefinition definition) {
         Field[] fields = definition.autowiredFields;
-        if (fields == null) {
-            return;
-        }
 
         for (Field field : fields) {
             autowireField(instance, field, definition);
@@ -90,7 +84,9 @@ public class BaseBeanLifecycleProcessor implements BeanLifecycleProcessor {
             }
         }
         try {
-            if (!field.isAccessible()) field.setAccessible(true);
+            if (!field.isAccessible()) {
+                field.setAccessible(true);
+            }
             field.set(instance, beanContainer.getBeanAnyScope(fieldBeanDefinition.beanClass));
         } catch (IllegalAccessException e) {
             throw new BeanInstantiationException(e);

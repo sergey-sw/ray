@@ -1,7 +1,7 @@
 package com.intelli.ray.log;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Author: Sergey Saiyan sergey.sova42@gmail.com
@@ -9,7 +9,7 @@ import java.util.List;
  */
 public class LoggerRegistryImpl implements LoggerRegistry {
 
-    private List<LogConsumer> logConsumers = new ArrayList<>();
+    private List<LogConsumer> logConsumers = new CopyOnWriteArrayList<>();
 
     @Override
     public void addLogConsumer(LogConsumer logConsumer) {

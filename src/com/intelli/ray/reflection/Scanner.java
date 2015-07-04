@@ -54,7 +54,7 @@ public class Scanner {
                         name = input.substring(0, input.lastIndexOf(".class"));
                         classes.add(Class.forName(name));
                     } catch (ClassNotFoundException e) {
-                        logger.log("Could not load class " + name + "\n" + Exceptions.toStr(e));
+                        logger.warn("Could not load class " + name + "\n" + Exceptions.toStr(e));
                     }
                 }
             }
@@ -79,7 +79,7 @@ public class Scanner {
                 }
             }
         } catch (IOException e) {
-            logger.log("Error getting resources for " + resourceName + "\n" + Exceptions.toStr(e));
+            logger.warn("Error getting resources for " + resourceName + "\n" + Exceptions.toStr(e));
         }
         return distinctUrls(result);
     }
@@ -128,7 +128,7 @@ public class Scanner {
                     if (dir != null) return dir;
                 }
             } catch (Throwable e) {
-                logger.log("Could not create Dir using " + type + " from url " + url.toExternalForm() + ". " +
+                logger.warn("Could not create Dir using " + type + " from url " + url.toExternalForm() + ". " +
                         "Skipping.\n" + Exceptions.toStr(e));
             }
         }
