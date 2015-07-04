@@ -1,8 +1,8 @@
 package com.intelli.ray.tests;
 
 import com.intelli.ray.base_scope.BeanNoName;
-import com.intelli.ray.core.BeanContainer;
 import com.intelli.ray.core.BeanDefinition;
+import com.intelli.ray.core.InternalBeanContainer;
 
 /**
  * Author: Sergey42
@@ -11,7 +11,7 @@ import com.intelli.ray.core.BeanDefinition;
 public class TestBeanIdGeneration extends RayTest {
 
     public void test() throws Exception {
-        BeanContainer container = context.getBeanContainer();
+        InternalBeanContainer container = (InternalBeanContainer) context.getBeanContainer();
         BeanDefinition beanDefinition = container.getBeanDefinition(BeanNoName.class);
 
         assertNotNull(beanDefinition.getId());

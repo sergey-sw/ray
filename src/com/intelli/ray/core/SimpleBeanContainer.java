@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Date: 17.05.2015 19:23
  */
 @SuppressWarnings("unchecked")
-public class SimpleBeanContainer implements BeanContainer {
+public class SimpleBeanContainer implements InternalBeanContainer {
 
     protected final Map<String, BeanDefinition> definitionByName = new ConcurrentHashMap<>();
     protected final Map<Class, BeanDefinition> definitionByClass = new ConcurrentHashMap<>();

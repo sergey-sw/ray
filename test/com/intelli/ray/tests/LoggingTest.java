@@ -31,7 +31,7 @@ public class LoggingTest extends TestCase {
 
         loggerRegistry.removeLogConsumer(consumer);
 
-        BeanContainer beanContainer = context.getBeanContainer();
+        InternalBeanContainer beanContainer = (InternalBeanContainer) context.getBeanContainer();
         beanContainer.register(new BeanDefinition("String-098765", Scope.SINGLETON, String.class, "098765", null));
 
         String log2 = sb.toString();

@@ -12,7 +12,7 @@ import java.lang.reflect.Field;
 public abstract class BaseContext implements Context {
 
     protected final ContextLogger logger = new ContextLogger();
-    protected volatile BeanContainer beanContainer;
+    protected volatile InternalBeanContainer beanContainer;
 
     protected volatile boolean started = false;
     protected boolean closed = false;
@@ -72,7 +72,7 @@ public abstract class BaseContext implements Context {
         }
     }
 
-    protected BeanContainer createBeanContainer() {
+    protected InternalBeanContainer createBeanContainer() {
         if (beanContainer != null) {
             beanContainer.destroyBeans();
         }
