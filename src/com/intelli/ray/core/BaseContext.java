@@ -19,9 +19,9 @@ public abstract class BaseContext implements Context {
 
     protected final Object lifecycleMonitor = new Object();
 
-    abstract void registerBeanDefinitions();
+    protected abstract void registerBeanDefinitions();
 
-    abstract void injectSingletonDependencies();
+    protected abstract void injectSingletonDependencies();
 
     @Override
     public BeanContainer getBeanContainer() {

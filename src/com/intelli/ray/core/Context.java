@@ -10,13 +10,33 @@ import com.intelli.ray.log.LoggerRegistry;
  */
 public interface Context {
 
+    /**
+     * Checks if context is fully initialized
+     *
+     * @return TRUE, if initialization phase was passed successfully
+     */
     boolean isActive();
 
+    /**
+     * Refreshes the context, destroys all created managed components,
+     * re-reads configuration and reloads bean definitions.
+     */
     void refresh();
 
+    /**
+     * Destroys the context with all created managed components.
+     */
     void destroy();
 
+    /**
+     * Returns the instance of BeanContainer, associated with
+     * the current context.
+     */
     BeanContainer getBeanContainer();
 
+    /**
+     * Returns the instance of LoggerRegistry, associated with
+     * the current context.
+     */
     LoggerRegistry getLoggerRegistry();
 }

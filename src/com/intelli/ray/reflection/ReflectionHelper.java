@@ -1,11 +1,11 @@
 package com.intelli.ray.reflection;
 
-import com.intelli.ray.core.ManagedConstructor;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -14,22 +14,34 @@ import java.util.Set;
  */
 public class ReflectionHelper {
 
-    public static Iterable<Class> getTypesAnnotatedWith(Iterable<Class> classes, Class<? extends Annotation> annotation) {
-        Set<Class> result = new HashSet<>();
+    public static Map<Class, Class<? extends Annotation>> getTypesAnnotatedWith(
+            Iterable<Class> classes,
+            Iterable<Class<? extends Annotation>> annotations) {
+
+        Map<Class, Class<? extends Annotation>> result = new HashMap<>();
+        classLoop:
         for (Class clazz : classes) {
-            if (clazz.isAnnotationPresent(annotation)) {
-                result.add(clazz);
+            for (Class<? extends Annotation> annotation : annotations) {
+                if (clazz.isAnnotationPresent(annotation)) {
+                    result.put(clazz, annotation);
+                    continue classLoop;
+                }
             }
+
         }
         return result;
     }
 
-    public static Field[] getAllAnnotatedFields(Class clazz, Class<? extends Annotation> annotation) {
+    public static Field[] getAllAnnotatedFields(Class clazz, Iterable<Class<? extends Annotation>> annotations) {
         Set<Field> fields = new HashSet<>();
         while (clazz != Object.class) {
+            fieldLoop:
             for (Field field : clazz.getDeclaredFields()) {
-                if (field.isAnnotationPresent(annotation)) {
-                    fields.add(field);
+                for (Class<? extends Annotation> annotation : annotations) {
+                    if (field.isAnnotationPresent(annotation)) {
+                        fields.add(field);
+                        continue fieldLoop;
+                    }
                 }
             }
             clazz = clazz.getSuperclass();
@@ -37,11 +49,13 @@ public class ReflectionHelper {
         return fields.toArray(new Field[fields.size()]);
     }
 
-    public static Constructor getManagedConstructor(Class clazz) {
+    public static Constructor getConstructorsAnnotatedWith(Class clazz, Iterable<Class<? extends Annotation>> annotations) {
         Constructor[] constructors = clazz.getConstructors();
         for (Constructor constructor : constructors) {
-            if (constructor.getAnnotation(ManagedConstructor.class) != null) {
-                return constructor;
+            for (Class<? extends Annotation> annotation : annotations) {
+                if (constructor.isAnnotationPresent(annotation)) {
+                    return constructor;
+                }
             }
         }
         return null;

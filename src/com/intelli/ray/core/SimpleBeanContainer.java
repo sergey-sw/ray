@@ -1,7 +1,6 @@
 package com.intelli.ray.core;
 
 import com.intelli.ray.log.ContextLogger;
-import com.intelli.ray.reflection.ReflectionHelper;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -179,8 +178,11 @@ public class SimpleBeanContainer implements InternalBeanContainer {
     }
 
     protected void doPrototypeInject(Object prototype, BeanDefinition definition) {
-        Class prototypeClass = definition.beanClass;
-        Field[] fields = ReflectionHelper.getAllAnnotatedFields(prototypeClass, Inject.class);
+        Field[] fields = definition.autowiredFields;
+        if (fields == null) {
+            return;
+        }
+
         for (Field field : fields) {
             doInject(field, prototype, definition);
         }

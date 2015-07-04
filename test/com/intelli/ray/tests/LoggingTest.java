@@ -32,7 +32,7 @@ public class LoggingTest extends TestCase {
         loggerRegistry.removeLogConsumer(consumer);
 
         InternalBeanContainer beanContainer = (InternalBeanContainer) context.getBeanContainer();
-        beanContainer.register(new BeanDefinition("String-098765", Scope.SINGLETON, String.class, "098765", null));
+        beanContainer.register(new BeanDefinition("String-098765", Scope.SINGLETON, String.class, "098765", null, null));
 
         String log2 = sb.toString();
         assertEquals(log, log2);

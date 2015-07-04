@@ -1,8 +1,8 @@
 package com.intelli.ray.core;
 
 /**
- * Exception indicated that requested bean is not found in bean context.
- * This may be caused by missing annotation or incorrect context dependencies.
+ * Exception indicates that requested component is not found in application context.
+ * This may be caused by incorrect component declaration or wrong context dependencies.
  * <p/>
  * Author: Sergey42
  * Date: 18.05.14 16:11
