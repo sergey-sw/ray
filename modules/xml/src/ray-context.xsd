@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="ray-context"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+    <xsd:element name="context">
+        <xsd:annotation>
+            <xsd:documentation>
+                Context represents a scope of related application components.
+            </xsd:documentation>
+        </xsd:annotation>
+
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="bean" maxOccurs="unbounded">
+                    <xsd:complexType>
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Bean represents a managed component in the application context.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                        <xsd:attribute name="id" type="xsd:string"/>
+                        <xsd:attribute name="scope" type="scopeType" default="singleton"/>
+                        <xsd:attribute name="class" type="xsd:string" use="required"/>
+                        <xsd:attribute name="init-methods" type="xsd:string"/>
+                        <xsd:attribute name="destroy-methods" type="xsd:string"/>
+                        <xsd:attribute name="autowired" type="xsd:string"/>
+                    </xsd:complexType>
+                </xsd:element>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:simpleType name="scopeType">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="singleton"/>
+            <xsd:enumeration value="prototype"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+</xsd:schema>

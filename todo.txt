@@ -1,0 +1,7 @@
+- overriding beans
+- inject bean collections
+- fix concurrency
+- lazy construction
+- scopes
+- bean definition builder
+- unite tests

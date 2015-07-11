@@ -1,18 +1,32 @@
 allprojects {
-    group = 'com.intel.eve'
-    version = '1.2'
-}
+    group = 'com.intelli.ray'
+    version = '1.0-SNAPSHOT'
 
-repositories {
-    mavenCentral()
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
 }
 
 apply(plugin: 'idea')
 apply(plugin: 'maven')
 
-configure(rootProject) {
+idea {
+    project {
+        languageLevel = '1.7'
+    }
+}
+
+def coreModule = project(':ray-core')
+def annModule = project(':ray-annotation')
+def xmlModule = project(':ray-xml')
+def jsonModule = project(':ray-json')
+def txtCommonsModule = project(':ray-txt-commons')
+
+configure([coreModule, annModule, xmlModule, jsonModule, txtCommonsModule]) {
     apply plugin: 'java'
     apply plugin: 'idea'
+    apply plugin: 'maven'
 
     dependencies {
         testCompile 'junit:junit:4.10'
@@ -38,5 +52,30 @@ configure(rootProject) {
 
     artifacts {
         archives sourceJar
+    }
+}
+
+configure(annModule) {
+    dependencies {
+        compile coreModule
+    }
+}
+
+configure(txtCommonsModule) {
+    dependencies {
+        compile coreModule
+    }
+}
+
+configure(jsonModule) {
+    dependencies {
+        compile txtCommonsModule
+        compile "com.eclipsesource.minimal-json:minimal-json:0.9.1"
+    }
+}
+
+configure(xmlModule) {
+    dependencies {
+        compile txtCommonsModule
     }
 }
