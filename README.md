@@ -92,7 +92,7 @@ Main.java
     public class Main {
 
        public static void main(String[] args) {
-           Context context = new JsonContext("com.myproject.core");
+           Context context = new JsonContext("classpath:context.json");
            context.refresh();
 
            BeanContainer beanContainer = context.getBeanContainer();
@@ -111,8 +111,7 @@ context.xml
              autowired="otherBean"/>
 
        <bean id="otherBean" 
-             class="com.myproject.core.OtherBean" 
-             autowired="otherBean"/>       
+             class="com.myproject.core.OtherBean"/>       
     </context>
 
 
@@ -125,7 +124,7 @@ Main.java
     public class Main {
 
        public static void main(String[] args) {
-           Context context = new XmlContext("com.myproject.core");
+           Context context = new XmlContext("classpath:context.xml");
            context.refresh();
 
            BeanContainer beanContainer = context.getBeanContainer();
