@@ -15,9 +15,9 @@ import java.util.Arrays;
  * Date: 04.07.2015 12:07
  */
 @InterfaceAudience.Development
-public class DefaultAnnotationConfiguration implements Configuration {
+public class DefaultAnnotationConfiguration implements AnnotationConfiguration {
 
-    private final NameAndScopeExtractor nameAndScopeExtractor = new NameAndScopeExtractor() {
+    protected final NameAndScopeExtractor nameAndScopeExtractor = new NameAndScopeExtractor() {
         @Override
         public NameAndScope extract(Annotation componentAnnotation) {
             ManagedComponent annotation = (ManagedComponent) componentAnnotation;

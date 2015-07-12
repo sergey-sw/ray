@@ -13,8 +13,8 @@ import com.intelli.ray.meta.InterfaceAudience;
 public class BeanNotFoundException extends IllegalArgumentException {
 
     String msg;
-    static String classPattern = "Bean of class '%s' is not present in context";
-    static String namePattern = "Bean with name '%s' is not present in context";
+    public static String classPattern = "Bean of class '%s' is not present in context";
+    public static String namePattern = "Bean with name '%s' is not present in context";
 
     public BeanNotFoundException(Class id) {
         msg = String.format(classPattern, id.getName());

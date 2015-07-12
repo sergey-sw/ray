@@ -15,9 +15,9 @@ public interface ConfigurableContext extends Context {
     /**
      * Returns instance of Configuration, that will be used
      * during context initialization.
-     * See {@link com.intelli.ray.core.Configuration}
+     * See {@link AnnotationConfiguration}
      *
      * @return configuration
      */
-    Configuration getConfiguration();
+    AnnotationConfiguration getConfiguration();
 }

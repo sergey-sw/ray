@@ -1,6 +1,9 @@
 package com.intelli.ray.tests;
 
-import com.intelli.ray.core.*;
+import com.intelli.ray.core.BeanDefinition;
+import com.intelli.ray.core.Context;
+import com.intelli.ray.core.InternalBeanContainer;
+import com.intelli.ray.core.Scope;
 import com.intelli.ray.log.LogConsumer;
 import com.intelli.ray.log.LoggerRegistry;
 import com.intelli.ray.log.SimpleLogConsumer;
@@ -16,7 +19,7 @@ import java.lang.reflect.Method;
 public class LoggingTest extends TestCase {
 
     public void testLogging() throws Exception {
-        Context context = new AnnotationContext("com.intelli.ray.base_scope");
+        Context context = new TestAnnotationContext();
         LoggerRegistry loggerRegistry = context.getLoggerRegistry();
 
         final StringBuilder sb = new StringBuilder();

@@ -18,9 +18,10 @@ import static com.intelli.ray.util.Reflections.*;
  * Date: 14.11.13 21:11
  */
 @InterfaceAudience.Public
-public class AnnotationContext extends BaseConfigurableContext {
+public class AnnotationContext extends BaseContext implements ConfigurableContext {
 
-    protected String[] scanLocations;
+    protected final String[] scanLocations;
+    protected final AnnotationConfiguration configuration;
 
     /**
      * Builds the context by annotation scanning in specified locations.
@@ -32,9 +33,14 @@ public class AnnotationContext extends BaseConfigurableContext {
         this(new DefaultAnnotationConfiguration(), scanLocations);
     }
 
-    public AnnotationContext(Configuration configuration, String... scanLocations) {
-        super(configuration);
+    public AnnotationContext(AnnotationConfiguration configuration, String... scanLocations) {
+        this.configuration = configuration;
         this.scanLocations = scanLocations;
+    }
+
+    @Override
+    public AnnotationConfiguration getConfiguration() {
+        return configuration;
     }
 
     @Override
@@ -47,17 +53,17 @@ public class AnnotationContext extends BaseConfigurableContext {
             throw e;
         }
 
-        Configuration configuration = getConfiguration();
+        AnnotationConfiguration configuration = getConfiguration();
         Iterable<Class<? extends Annotation>> annotations = configuration.getManagedComponentAnnotations();
         Map<Class, Class<? extends Annotation>> classMap = getTypesAnnotatedWith(scanner.getClasses(), annotations);
-        Configuration.NameAndScopeExtractor nameAndScopeExtractor = configuration.getNameAndScopeExtractor();
+        AnnotationConfiguration.NameAndScopeExtractor nameAndScopeExtractor = configuration.getNameAndScopeExtractor();
 
         for (Map.Entry<Class, Class<? extends Annotation>> entry : classMap.entrySet()) {
             Class clazz = entry.getKey();
             Class<? extends Annotation> annotationClass = entry.getValue();
 
             Annotation ann = clazz.getAnnotation(annotationClass);
-            Configuration.NameAndScope nameAndScope = nameAndScopeExtractor.extract(ann);
+            AnnotationConfiguration.NameAndScope nameAndScope = nameAndScopeExtractor.extract(ann);
 
             String beanId = !nameAndScope.name.isEmpty() ? nameAndScope.name : clazz.getName();
             Scope scope = nameAndScope.scope;

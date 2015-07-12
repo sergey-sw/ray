@@ -3,14 +3,19 @@ package com.intelli.ray.tests;
 import com.intelli.ray.base_scope.BeanWithPostConstruct1;
 import com.intelli.ray.base_scope.BeanWithPostConstruct2;
 import com.intelli.ray.core.BeanContainer;
+import com.intelli.ray.core.Context;
+import junit.framework.TestCase;
 
 /**
  * Author: Sergey Saiyan sergey.sova42@gmail.com
  * Date: 02.07.2015 23:26
  */
-public class PostConstructOrderTest extends AnnotationTest {
+public class PostConstructOrderTest extends TestCase {
 
     public void test() throws Exception {
+        Context context = new TestAnnotationContext();
+        context.refresh();
+
         BeanContainer beanContainer = context.getBeanContainer();
         BeanWithPostConstruct2 bean = beanContainer.getBean(BeanWithPostConstruct2.class);
 

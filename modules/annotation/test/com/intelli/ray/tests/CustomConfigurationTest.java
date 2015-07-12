@@ -3,9 +3,9 @@ package com.intelli.ray.tests;
 import com.intelli.ray.base_scope.CustomBean;
 import com.intelli.ray.base_scope.MBEAN;
 import com.intelli.ray.base_scope.WIRE;
+import com.intelli.ray.core.AnnotationConfiguration;
 import com.intelli.ray.core.AnnotationContext;
 import com.intelli.ray.core.ConfigurableContext;
-import com.intelli.ray.core.Configuration;
 import com.intelli.ray.core.DefaultAnnotationConfiguration;
 import com.intelli.ray.meta.ManagedComponent;
 import junit.framework.TestCase;
@@ -31,7 +31,7 @@ public class CustomConfigurationTest extends TestCase {
         }
     }
 
-    Configuration configuration = new DefaultAnnotationConfiguration() {
+    AnnotationConfiguration configuration = new DefaultAnnotationConfiguration() {
         @Override
         public Iterable<Class<? extends Annotation>> getManagedComponentAnnotations() {
             return Arrays.asList(MBEAN.class, ManagedComponent.class);

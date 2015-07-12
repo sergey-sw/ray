@@ -6,8 +6,6 @@ import java.lang.annotation.Annotation;
 import java.util.Objects;
 
 /**
- * TODO AnnotationConfiguration or smth
- *
  * Configuration allows to encapsulate meta information specific details.
  * In annotation context managed components and their relations are declared with
  * annotations. By default, Ray uses {@link com.intelli.ray.meta.ManagedComponent}
@@ -25,7 +23,7 @@ import java.util.Objects;
  * Date: 04.07.2015 12:00
  */
 @InterfaceAudience.Public
-public interface Configuration {
+public interface AnnotationConfiguration {
 
     /**
      * Method declares what kind of annotations are used to indicate, that class
@@ -36,7 +34,7 @@ public interface Configuration {
 
     /**
      * Returns a NameAndScopeExtractor for this configuration.
-     * See {@link com.intelli.ray.core.Configuration.NameAndScopeExtractor}
+     * See {@link AnnotationConfiguration.NameAndScopeExtractor}
      */
     NameAndScopeExtractor getNameAndScopeExtractor();
 

@@ -1,6 +1,6 @@
 package com.intelli.ray.base_scope;
 
-import com.intelli.ray.core.Configuration;
+import com.intelli.ray.core.AnnotationConfiguration;
 import com.intelli.ray.core.Scope;
 import com.intelli.ray.meta.ManagedComponent;
 
@@ -21,14 +21,14 @@ public class CustomBean {
         return single;
     }
 
-    public static Configuration.NameAndScopeExtractor extractor = new Configuration.NameAndScopeExtractor() {
+    public static AnnotationConfiguration.NameAndScopeExtractor extractor = new AnnotationConfiguration.NameAndScopeExtractor() {
         @Override
-        public Configuration.NameAndScope extract(Annotation componentAnnotation) {
+        public AnnotationConfiguration.NameAndScope extract(Annotation componentAnnotation) {
             if (componentAnnotation.annotationType().equals(ManagedComponent.class)) {
                 ManagedComponent c = (ManagedComponent) componentAnnotation;
-                return new Configuration.NameAndScope(c.name(), c.scope());
+                return new AnnotationConfiguration.NameAndScope(c.name(), c.scope());
             }
-            return new Configuration.NameAndScope("custom", Scope.SINGLETON);
+            return new AnnotationConfiguration.NameAndScope("custom", Scope.SINGLETON);
         }
     };
 }

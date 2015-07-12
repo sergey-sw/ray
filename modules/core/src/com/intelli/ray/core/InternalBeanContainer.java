@@ -3,6 +3,8 @@ package com.intelli.ray.core;
 import com.intelli.ray.meta.InterfaceAudience;
 
 /**
+ * Extension of BeanContainer with internal methods.
+ * <p/>
  * Author: Sergey Saiyan sergey.sova42@gmail.com
  * Date: 04.07.2015 11:35
  */
