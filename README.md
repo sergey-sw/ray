@@ -1,11 +1,10 @@
 # Ray
-Ray is a light-weight dependency container implementation. It was created for research purposes 
-and does not support most of the features, that are present in Spring or Pico. However, several applications were
-created using Ray.
+Ray is a light-weight dependency injection container implementation. It was created for research purposes 
+and does not support most of the features, that are present in Spring, Tapestry or PicoContainer. However, several applications were created using Ray.
 
 Ray project is separated into modules to make the result jar size as light as possible.
 
-- ray-core (base API)
+- ray-core (core API)
 - ray-annotation (annotation context implementation)
 - ray-json (json context implementation)
 - ray-xml (xml context implementation)
