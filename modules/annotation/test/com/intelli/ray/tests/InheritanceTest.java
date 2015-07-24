@@ -19,6 +19,6 @@ public class InheritanceTest extends TestCase {
         ChildBean bean = beanContainer.getBean(ChildBean.class);
 
         assertNotNull(bean.getSingle());
-        assertNotNull(bean.getBeanNoName());
+        assertNotNull(bean.getAnnBeanNoName());
     }
 }

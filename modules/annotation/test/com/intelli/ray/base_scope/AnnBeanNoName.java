@@ -7,5 +7,5 @@ import com.intelli.ray.meta.ManagedComponent;
  * Date: 17.05.2015 21:26
  */
 @ManagedComponent
-public class BeanNoName {
+public class AnnBeanNoName {
 }

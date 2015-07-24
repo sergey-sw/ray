@@ -11,9 +11,9 @@ import com.intelli.ray.meta.ManagedComponent;
 public class ParentBean {
 
     @Inject
-    private BeanNoName beanNoName;
+    private AnnBeanNoName annBeanNoName;
 
-    public BeanNoName getBeanNoName() {
-        return beanNoName;
+    public AnnBeanNoName getAnnBeanNoName() {
+        return annBeanNoName;
     }
 }

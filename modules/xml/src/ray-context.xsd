@@ -14,7 +14,7 @@
 
         <xsd:complexType>
             <xsd:sequence>
-                <xsd:element name="bean" maxOccurs="unbounded">
+                <xsd:element name="bean" minOccurs="0" maxOccurs="unbounded">
                     <xsd:complexType>
                         <xsd:annotation>
                             <xsd:documentation>
@@ -27,6 +27,24 @@
                         <xsd:attribute name="init-methods" type="xsd:string"/>
                         <xsd:attribute name="destroy-methods" type="xsd:string"/>
                         <xsd:attribute name="autowired" type="xsd:string"/>
+                        <xsd:attribute name="profiles" type="xsd:string"/>
+                    </xsd:complexType>
+                </xsd:element>
+                <xsd:element name="profiles" minOccurs="0" maxOccurs="1">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Profiles represents scopes of components, that are used in a specific environments
+                        </xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="profile" minOccurs="1" maxOccurs="unbounded">
+                                <xsd:complexType>
+                                    <xsd:attribute name="name" type="xsd:string" use="required"/>
+                                    <xsd:attribute name="active" type="xsd:boolean" use="optional" default="true"/>
+                                </xsd:complexType>
+                            </xsd:element>
+                        </xsd:sequence>
                     </xsd:complexType>
                 </xsd:element>
             </xsd:sequence>

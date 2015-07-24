@@ -19,6 +19,7 @@ Supported features:
 - Singleton and Prototype scopes
 - As-Is component injection
 - PostConstruct and PreDestroy lifecycle hooks
+- Profiles for different deployment environments
 
 
 Examples:

@@ -1,15 +1,17 @@
 package com.intelli.ray.core;
 
 import com.intelli.ray.meta.InterfaceAudience;
+import com.intelli.ray.meta.Profile;
 import com.intelli.ray.reflection.ReflectionException;
 import com.intelli.ray.reflection.Scanner;
 import com.intelli.ray.util.Exceptions;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Map;
+import java.util.*;
 
 import static com.intelli.ray.util.Reflections.*;
 
@@ -62,6 +64,12 @@ public class AnnotationContext extends BaseContext implements ConfigurableContex
             Class clazz = entry.getKey();
             Class<? extends Annotation> annotationClass = entry.getValue();
 
+            Collection<String> beanProfiles = extractProfiles(clazz);
+            if (!acceptProfiles(beanProfiles)) {
+                logger.info("Skip registration of " + clazz + " - no profile match.");
+                continue;
+            }
+
             Annotation ann = clazz.getAnnotation(annotationClass);
             AnnotationConfiguration.NameAndScope nameAndScope = nameAndScopeExtractor.extract(ann);
 
@@ -75,9 +83,9 @@ public class AnnotationContext extends BaseContext implements ConfigurableContex
             }
 
             BeanDefinition definition;
-            Method[] initMethods = getUniqueMethodsAnnotatedWith(clazz, configuration.getInitMethodAnnotations());
-            Method[] destroyMethods = getUniqueMethodsAnnotatedWith(clazz, configuration.getDestroyMethodAnnotations());
-            Field[] autowiredFields = getFieldsAnnotatedWith(clazz, configuration.getAutowiredAnnotations());
+            Method[] initMethods = filterByProfile(getUniqueMethodsAnnotatedWith(clazz, configuration.getInitMethodAnnotations()));
+            Method[] destroyMethods = filterByProfile(getUniqueMethodsAnnotatedWith(clazz, configuration.getDestroyMethodAnnotations()));
+            Field[] autowiredFields = filterByProfile(getFieldsAnnotatedWith(clazz, configuration.getAutowiredAnnotations()));
             if (constructor != null) {
                 definition = new BeanDefinition(beanId, scope, clazz, constructor, initMethods,
                         destroyMethods, autowiredFields);
@@ -91,6 +99,37 @@ public class AnnotationContext extends BaseContext implements ConfigurableContex
             }
 
             beanContainer.register(definition);
+        }
+    }
+
+    protected Field[] filterByProfile(Field[] fields) {
+        List<Field> result = new ArrayList<>();
+        for (Field field : fields) {
+            Collection<String> profiles = extractProfiles(field);
+            if (profiles == null || acceptProfiles(profiles)) {
+                result.add(field);
+            }
+        }
+        return result.toArray(new Field[result.size()]);
+    }
+
+    protected Method[] filterByProfile(Method[] methods) {
+        List<Method> result = new ArrayList<>();
+        for (Method method : methods) {
+            Collection<String> profiles = extractProfiles(method);
+            if (profiles == null || acceptProfiles(profiles)) {
+                result.add(method);
+            }
+        }
+        return result.toArray(new Method[result.size()]);
+    }
+
+    protected Collection<String> extractProfiles(AnnotatedElement beanClass) {
+        Profile profileAnn = beanClass.getAnnotation(Profile.class);
+        if (profileAnn != null) {
+            return Arrays.asList(profileAnn.value());
+        } else {
+            return null;
         }
     }
 }

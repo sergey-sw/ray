@@ -3,6 +3,8 @@ package com.intelli.ray.core;
 import com.intelli.ray.log.LoggerRegistry;
 import com.intelli.ray.meta.InterfaceAudience;
 
+import java.util.Collection;
+
 /**
  * Context represents a scope of related application components.
  * <p/>
@@ -48,4 +50,16 @@ public interface Context {
      * @param classLoader class loader
      */
     void setClassLoader(ClassLoader classLoader);
+
+    /**
+     * Sets profiles, that will be used to build a context.
+     *
+     * @param profiles names of profiles
+     */
+    void setProfiles(Collection<String> profiles);
+
+    /**
+     * Returns profile names for a current context
+     */
+    Collection<String> getProfiles();
 }

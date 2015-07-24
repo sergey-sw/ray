@@ -35,7 +35,7 @@ public class BaseBeanLifecycleProcessor implements BeanLifecycleProcessor {
                 method.setAccessible(true);
             }
             try {
-                logger.debug(String.format("Invoking init method %s in bean %s",
+                logger.debug(String.format("Invoking init method %s() in bean %s",
                         method.getName(), beanDefinition));
                 method.invoke(instance);
             } catch (IllegalAccessException | InvocationTargetException e) {
@@ -50,7 +50,7 @@ public class BaseBeanLifecycleProcessor implements BeanLifecycleProcessor {
     public void invokeDestroyMethods(Object instance, BeanDefinition definition) {
         if (definition.destroyMethods != null) {
             for (Method destroyMethod : definition.destroyMethods) {
-                logger.debug(String.format("Invoking pre-destroy method %s in bean %s",
+                logger.debug(String.format("Invoking pre-destroy method %s() in bean %s",
                         destroyMethod.getName(), definition));
                 try {
                     if (!destroyMethod.isAccessible()) {
@@ -85,16 +85,20 @@ public class BaseBeanLifecycleProcessor implements BeanLifecycleProcessor {
                 }
             }
             if (fieldBeanDefinition == null) {
-                throw new BeanInstantiationException("Can not inject property '" + field.getName() + "' in bean " +
+                logger.error("Can not inject property '" + field.getName() + "' in bean " +
                         definition.beanClass.getName() + ", because property bean class " + fieldClazz.getName()
                         + " is not present in context.");
+                return;
             }
         }
         try {
             if (!field.isAccessible()) {
                 field.setAccessible(true);
             }
-            field.set(instance, beanContainer.getBeanAnyScope(fieldBeanDefinition.beanClass));
+            Object autowiredValue = beanContainer.getBeanAnyScope(fieldBeanDefinition.beanClass);
+            field.set(instance, autowiredValue);
+            logger.info(String.format("Autowired field %s of class %s with value of class %s",
+                    field.getName(), definition.getClass().getName(), autowiredValue.getClass().getName()));
         } catch (IllegalAccessException e) {
             throw new BeanInstantiationException(e);
         }

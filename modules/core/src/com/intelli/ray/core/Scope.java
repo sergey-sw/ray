@@ -38,4 +38,8 @@ public enum Scope {
     public static Scope defaultScope(Scope src) {
         return src != null ? src : SINGLETON;
     }
+
+    public static String defaultScope() {
+        return SINGLETON.getId();
+    }
 }

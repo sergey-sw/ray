@@ -5,10 +5,7 @@ import com.intelli.ray.meta.InterfaceAudience;
 import com.intelli.ray.util.Exceptions;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -30,7 +27,18 @@ public class BaseBeanContainer implements InternalBeanContainer {
     }
 
     @Override
+    public boolean containsBean(String name) {
+        return definitionByName.containsKey(Objects.requireNonNull(name));
+    }
+
+    @Override
+    public boolean containsBean(Class clazz) {
+        return definitionByClass.containsKey(Objects.requireNonNull(clazz));
+    }
+
+    @Override
     public <T> T getBean(Class<T> beanClass) {
+        beanClass = Objects.requireNonNull(beanClass);
         BeanDefinition beanDefinition = checkNotNull(definitionByClass.get(beanClass), beanClass);
         validateScope(beanDefinition, Scope.SINGLETON);
         return (T) beanDefinition.singletonInstance;
@@ -38,6 +46,7 @@ public class BaseBeanContainer implements InternalBeanContainer {
 
     @Override
     public <T> T getBean(String name) {
+        name = Objects.requireNonNull(name);
         BeanDefinition beanDefinition = checkNotNull(definitionByName.get(name), name);
         validateScope(beanDefinition, Scope.SINGLETON);
         return (T) beanDefinition.singletonInstance;
@@ -45,6 +54,7 @@ public class BaseBeanContainer implements InternalBeanContainer {
 
     @Override
     public <T> Collection<T> getBeansByType(Class<T> beanClass) {
+        beanClass = Objects.requireNonNull(beanClass);
         List<T> beansOfType = new ArrayList<>();
         for (BeanDefinition definition : definitionByClass.values()) {
             if (definition.scope == Scope.SINGLETON && beanClass.isAssignableFrom(definition.beanClass)) {
@@ -56,6 +66,7 @@ public class BaseBeanContainer implements InternalBeanContainer {
 
     @Override
     public <T> T createPrototype(Class<T> beanClass) {
+        beanClass = Objects.requireNonNull(beanClass);
         BeanDefinition beanDefinition = checkNotNull(definitionByClass.get(beanClass), beanClass);
         validateScope(beanDefinition, Scope.PROTOTYPE);
         return createPrototype(beanDefinition);
@@ -63,6 +74,7 @@ public class BaseBeanContainer implements InternalBeanContainer {
 
     @Override
     public <T> T createPrototype(String name) {
+        name = Objects.requireNonNull(name);
         BeanDefinition beanDefinition = checkNotNull(definitionByName.get(name), name);
         validateScope(beanDefinition, Scope.PROTOTYPE);
         return createPrototype(beanDefinition);
@@ -70,6 +82,7 @@ public class BaseBeanContainer implements InternalBeanContainer {
 
     @Override
     public <T> T createPrototype(Class<T> beanClass, Object... constructorParams) {
+        beanClass = Objects.requireNonNull(beanClass);
         BeanDefinition beanDefinition = checkNotNull(definitionByClass.get(beanClass), beanClass);
         validateScope(beanDefinition, Scope.PROTOTYPE);
 
@@ -89,6 +102,7 @@ public class BaseBeanContainer implements InternalBeanContainer {
 
     @Override
     public <T> T createPrototype(String name, Object... constructorParams) {
+        name = Objects.requireNonNull(name);
         BeanDefinition beanDefinition = checkNotNull(definitionByName.get(name), name);
         validateScope(beanDefinition, Scope.PROTOTYPE);
 
@@ -108,11 +122,12 @@ public class BaseBeanContainer implements InternalBeanContainer {
 
     @Override
     public BeanDefinition getBeanDefinition(Class beanClass) {
-        return definitionByClass.get(beanClass);
+        return definitionByClass.get(Objects.requireNonNull(beanClass));
     }
 
     @Override
     public void register(BeanDefinition beanDefinition) {
+        Objects.requireNonNull(beanDefinition);
         definitionByName.put(beanDefinition.id, beanDefinition);
         definitionByClass.put(beanDefinition.beanClass, beanDefinition);
 
@@ -151,6 +166,11 @@ public class BaseBeanContainer implements InternalBeanContainer {
     }
 
     @Override
+    public int size() {
+        return definitionByClass.size();
+    }
+
+    @Override
     public Iterable<Class> getManagedComponentClasses() {
         return definitionByClass.keySet();
     }
@@ -161,6 +181,7 @@ public class BaseBeanContainer implements InternalBeanContainer {
 
     @Override
     public <T> T getBeanAnyScope(Class<T> beanClass) {
+        beanClass = Objects.requireNonNull(beanClass);
         BeanDefinition beanDefinition = checkNotNull(definitionByClass.get(beanClass), beanClass);
 
         if (Scope.SINGLETON == beanDefinition.scope) {
@@ -171,6 +192,7 @@ public class BaseBeanContainer implements InternalBeanContainer {
     }
 
     protected <T> T createPrototype(BeanDefinition beanDefinition) {
+        beanDefinition = Objects.requireNonNull(beanDefinition);
         try {
             T prototypeInstance = (T) beanDefinition.beanClass.newInstance();
             beanLifecycleProcessor.autowireFields(prototypeInstance, beanDefinition);

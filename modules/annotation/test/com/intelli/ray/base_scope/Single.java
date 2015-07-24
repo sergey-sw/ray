@@ -9,9 +9,9 @@ import com.intelli.ray.meta.ManagedComponent;
 @ManagedComponent(name = "Single")
 public class Single {
 
-    protected BeanNoName beanNoName;
+    protected AnnBeanNoName annBeanNoName;
 
-    public BeanNoName getBeanNoName() {
-        return beanNoName;
+    public AnnBeanNoName getAnnBeanNoName() {
+        return annBeanNoName;
     }
 }

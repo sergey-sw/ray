@@ -17,11 +17,15 @@ public interface InternalBeanContainer extends BeanContainer {
 
     void register(BeanDefinition beanDefinition);
 
-    <T> T getBeanAnyScope(Class<T> beanClass);
+    <T> T getBeanAnyScope(Class<T> beanClass) throws BeanNotFoundException;
+
+    ;
 
     void autowireSingletons();
 
     void initSingletons();
 
     void destroyBeans();
+
+    int size();
 }

@@ -13,17 +13,21 @@ import java.util.Collection;
 @InterfaceAudience.Public
 public interface BeanContainer {
 
-    <T> T getBean(Class<T> beanClass);
+    boolean containsBean(String name);
 
-    <T> T getBean(String name);
+    boolean containsBean(Class clazz);
+
+    <T> T getBean(Class<T> beanClass) throws BeanNotFoundException;
+
+    <T> T getBean(String name) throws BeanNotFoundException;
 
     <T> Collection<T> getBeansByType(Class<T> beanClass);
 
-    <T> T createPrototype(Class<T> beanClass);
+    <T> T createPrototype(Class<T> beanClass) throws BeanNotFoundException;
 
-    <T> T createPrototype(String name);
+    <T> T createPrototype(String name) throws BeanNotFoundException;
 
-    <T> T createPrototype(Class<T> beanClass, Object... constructorParams);
+    <T> T createPrototype(Class<T> beanClass, Object... constructorParams) throws BeanNotFoundException;
 
-    <T> T createPrototype(String name, Object... constructorParams);
+    <T> T createPrototype(String name, Object... constructorParams) throws BeanNotFoundException;
 }

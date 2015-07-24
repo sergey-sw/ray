@@ -1,0 +1,21 @@
+{
+    "beans": [
+        {
+            "id": "b1",
+            "class": "com.intelli.ray.profiles.B1",
+            "profiles": ["production"],
+            "autowired": ["b2", "b3"]
+        },
+        {
+            "id": "b2",
+            "class": "com.intelli.ray.profiles.B2",
+            "profiles": ["test", "integration-test"]
+        },
+        {
+            "id": "b3",
+            "class": "com.intelli.ray.profiles.B3",
+            "profiles": ["production"]
+        }
+    ],
+    "profiles": ["production"]
+}
