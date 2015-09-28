@@ -30,7 +30,7 @@ MyBean.java
     
     package com.myproject.core;
 
-    import com.intelli.ray.meta.ManagedComponent;
+    import org.skywind.ray.meta.ManagedComponent;
     
     @ManagedComponent("greeter");
     public class Greeter {
@@ -46,9 +46,9 @@ MyBean.java
 Main.java
 
 
-    import com.intelli.ray.core.AnnotationContext;
-    import com.intelli.ray.core.BeanContainer;
-    import com.intelli.ray.core.Context;
+    import org.skywind.ray.core.AnnotationContext;
+    import org.skywind.ray.core.BeanContainer;
+    import org.skywind.ray.core.Context;
         
     public class Main {
 
@@ -85,9 +85,9 @@ context.json
 
 Main.java
 
-    import com.intelli.ray.core.JsonContext;
-    import com.intelli.ray.core.BeanContainer;
-    import com.intelli.ray.core.Context;
+    import org.skywind.ray.core.JsonContext;
+    import org.skywind.ray.core.BeanContainer;
+    import org.skywind.ray.core.Context;
 
     public class Main {
 
@@ -117,9 +117,9 @@ context.xml
 
 Main.java
 
-    import com.intelli.ray.core.XmlContext;
-    import com.intelli.ray.core.BeanContainer;
-    import com.intelli.ray.core.Context;
+    import org.skywind.ray.core.XmlContext;
+    import org.skywind.ray.core.BeanContainer;
+    import org.skywind.ray.core.Context;
 
     public class Main {
 
