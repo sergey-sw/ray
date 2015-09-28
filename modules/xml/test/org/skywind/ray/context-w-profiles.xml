@@ -1,0 +1,11 @@
+<context xmlns="ray-context">
+
+    <bean id="b1" class="org.skywind.ray.profiles.B1" profiles="production" autowired="b2,b3"/>
+    <bean id="b2" class="org.skywind.ray.profiles.B2" profiles="test,integrationTest"/>
+    <bean id="b3" class="org.skywind.ray.profiles.B3" profiles="production"/>
+
+    <profiles>
+        <profile name="production"/>
+    </profiles>
+</context>
+
