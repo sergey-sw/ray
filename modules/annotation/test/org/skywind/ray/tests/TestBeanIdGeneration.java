@@ -31,6 +31,6 @@ public class TestBeanIdGeneration extends TestCase {
         assertFalse(beanDefinition.getId().isEmpty());
 
 
-        assertEquals("com.intelli.ray.base_scope.AnnBeanNoName", beanDefinition.getId());
+        assertEquals("org.skywind.ray.base_scope.AnnBeanNoName", beanDefinition.getId());
     }
 }

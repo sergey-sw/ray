@@ -2,43 +2,43 @@
     "beans": [
         {
             "id": "test",
-            "class": "com.intelli.ray.base_scope.BeanNoName",
+            "class": "org.skywind.ray.base_scope.BeanNoName",
             "scope": "singleton"
         },
         {
             "id": "single",
-            "class": "com.intelli.ray.base_scope.JsonSingle",
+            "class": "org.skywind.ray.base_scope.JsonSingle",
             "scope": "singleton",
             "autowired": ["beanNoName"]
         },
         {
             "id": "disposable",
-            "class": "com.intelli.ray.base_scope.LifecycleBean",
+            "class": "org.skywind.ray.base_scope.LifecycleBean",
             "scope": "singleton",
             "init-methods": ["init"],
             "destroy-methods": ["onDestroy"]
         },
         {
             "id": "child",
-            "class": "com.intelli.ray.base_scope.ChildBean",
+            "class": "org.skywind.ray.base_scope.ChildBean",
             "scope": "singleton",
             "autowired": ["single", "beanNoName"]
         },
         {
             "id": "parent",
-            "class": "com.intelli.ray.base_scope.ParentBean",
+            "class": "org.skywind.ray.base_scope.ParentBean",
             "scope": "singleton",
             "autowired": ["beanNoName"]
         },
         {
             "id": "bwpc1",
-            "class": "com.intelli.ray.base_scope.BeanWithPostConstruct1",
+            "class": "org.skywind.ray.base_scope.BeanWithPostConstruct1",
             "scope": "singleton",
             "init-methods": ["init1", "init2"]
         },
         {
             "id": "bwpc2",
-            "class": "com.intelli.ray.base_scope.BeanWithPostConstruct2",
+            "class": "org.skywind.ray.base_scope.BeanWithPostConstruct2",
             "scope": "singleton",
             "init-methods": ["init1", "init2"]
         }

@@ -16,7 +16,7 @@ import java.util.Collection;
 public class ProfilesTest extends TestCase {
 
     public void test() throws Exception {
-        Context context = new XmlContext("classpath:com/intelli/ray/context-w-profiles.xml");
+        Context context = new XmlContext("classpath:org/skywind/ray/context-w-profiles.xml");
         context.getLoggerRegistry().addLogConsumer(new SimpleLogConsumer() {
             @Override
             public void log(String msg) {

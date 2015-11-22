@@ -20,7 +20,7 @@ import java.util.Arrays;
 public class CustomConfigurationTest extends TestCase {
 
     public void test() throws Exception {
-        ConfigurableContext context = new AnnotationContext(configuration, "com.intelli.ray.base_scope");
+        ConfigurableContext context = new AnnotationContext(configuration, "org.skywind.ray.base_scope");
         context.refresh();
 
         CustomBean bean = context.getBeanContainer().getBean(CustomBean.class);

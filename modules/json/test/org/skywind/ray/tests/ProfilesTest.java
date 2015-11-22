@@ -16,7 +16,7 @@ import java.util.Collection;
 public class ProfilesTest extends TestCase {
 
     public void test() throws Exception {
-        Context context = new JsonContext("classpath:com/intelli/ray/tests/context-w-profiles.json");
+        Context context = new JsonContext("classpath:org/skywind/ray/tests/context-w-profiles.json");
         context.getLoggerRegistry().addLogConsumer(new SimpleLogConsumer() {
             @Override
             public void log(String msg) {

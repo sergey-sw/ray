@@ -11,7 +11,7 @@ import org.skywind.ray.core.Context;
 public class TestContextStart extends TestCase {
 
     public void test() {
-        Context context = new AnnotationContext("com.intelli.ray.base_scope");
+        Context context = new AnnotationContext("org.skywind.ray.base_scope");
 
         assertFalse(context.isActive());
 

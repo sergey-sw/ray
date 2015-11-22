@@ -12,7 +12,7 @@ import org.skywind.ray.core.Context;
 public class LifecycleTest extends TestCase {
 
     public void test() throws Exception {
-        Context context = new AnnotationContext("com.intelli.ray.base_scope");
+        Context context = new AnnotationContext("org.skywind.ray.base_scope");
 
         context.refresh();
 

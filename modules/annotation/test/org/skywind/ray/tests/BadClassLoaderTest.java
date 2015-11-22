@@ -11,7 +11,7 @@ import org.skywind.ray.core.Context;
 public class BadClassLoaderTest extends TestCase {
 
     public void test() throws Exception {
-        Context context = new AnnotationContext("com.intelli.ray.base_scope", "com.intelli.ray.lonely_package");
+        Context context = new AnnotationContext("org.skywind.ray.base_scope", "org.skywind.ray.lonely_package");
         context.setClassLoader(new ClassLoader() {
             @Override
             public Class<?> loadClass(String name) throws ClassNotFoundException {

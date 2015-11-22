@@ -9,6 +9,6 @@ import org.skywind.ray.core.AnnotationContext;
 public class TestAnnotationContext extends AnnotationContext {
 
     public TestAnnotationContext() {
-        super("com.intelli.ray.base_scope");
+        super("org.skywind.ray.base_scope");
     }
 }

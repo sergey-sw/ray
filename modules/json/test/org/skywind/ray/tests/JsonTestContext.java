@@ -9,6 +9,6 @@ import org.skywind.ray.core.JsonContext;
 public class JsonTestContext extends JsonContext {
 
     public JsonTestContext() {
-        super("classpath:com/intelli/ray/tests/context.json");
+        super("classpath:org/skywind/ray/tests/context.json");
     }
 }

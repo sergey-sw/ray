@@ -13,7 +13,7 @@ import org.skywind.ray.core.XmlContext;
 public class AllFieldsTest extends TestCase {
 
     public void test() throws Exception {
-        Context context = new XmlContext("classpath:com/intelli/ray/context.xml");
+        Context context = new XmlContext("classpath:org/skywind/ray/context.xml");
         context.refresh();
 
         BeanContainer beanContainer = context.getBeanContainer();

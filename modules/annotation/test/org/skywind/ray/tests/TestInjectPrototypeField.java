@@ -13,7 +13,7 @@ import org.skywind.ray.proto_test_scope.BeanWithInjections;
 public class TestInjectPrototypeField extends TestCase {
 
     public void test() throws Exception {
-        Context protoCtx = new AnnotationContext("com.intelli.ray.proto_test_scope");
+        Context protoCtx = new AnnotationContext("org.skywind.ray.proto_test_scope");
         protoCtx.refresh();
 
         BeanContainer container = protoCtx.getBeanContainer();

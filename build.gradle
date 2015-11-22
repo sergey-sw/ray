@@ -1,5 +1,5 @@
 allprojects {
-    group = 'com.intelli.ray'
+    group = 'org.skywind.ray'
     version = '1.0-SNAPSHOT'
 
     repositories {

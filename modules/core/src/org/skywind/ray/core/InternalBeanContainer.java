@@ -19,8 +19,6 @@ public interface InternalBeanContainer extends BeanContainer {
 
     <T> T getBeanAnyScope(Class<T> beanClass) throws BeanNotFoundException;
 
-    ;
-
     void autowireSingletons();
 
     void initSingletons();
