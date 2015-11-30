@@ -32,19 +32,6 @@ configure([coreModule, annModule, xmlModule, jsonModule, txtCommonsModule]) {
         testCompile 'junit:junit:4.10'
     }
 
-    sourceSets {
-        main {
-            java {
-                srcDir 'src'
-            }
-        }
-        test {
-            java {
-                srcDir 'test'
-            }
-        }
-    }
-
     task sourceJar(type: Jar) {
         from file('src')
         classifier = 'sources'
