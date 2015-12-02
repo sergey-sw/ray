@@ -55,10 +55,10 @@ public class AnnotationContext extends BaseContext implements ConfigurableContex
             throw e;
         }
 
-        AnnotationConfiguration configuration = getConfiguration();
-        Iterable<Class<? extends Annotation>> annotations = configuration.getManagedComponentAnnotations();
+        AnnotationConfiguration conf = getConfiguration();
+        Iterable<Class<? extends Annotation>> annotations = conf.getManagedComponentAnnotations();
         Map<Class, Class<? extends Annotation>> classMap = getTypesAnnotatedWith(scanner.getClasses(), annotations);
-        AnnotationConfiguration.NameAndScopeExtractor nameAndScopeExtractor = configuration.getNameAndScopeExtractor();
+        AnnotationConfiguration.NameAndScopeExtractor nameAndScopeExtractor = conf.getNameAndScopeExtractor();
 
         for (Map.Entry<Class, Class<? extends Annotation>> entry : classMap.entrySet()) {
             Class clazz = entry.getKey();
@@ -76,16 +76,16 @@ public class AnnotationContext extends BaseContext implements ConfigurableContex
             String beanId = !nameAndScope.name.isEmpty() ? nameAndScope.name : clazz.getName();
             Scope scope = nameAndScope.scope;
 
-            Constructor constructor = getConstructorsAnnotatedWith(clazz, configuration.getManagedConstructorAnnotations());
+            Constructor constructor = getConstructorsAnnotatedWith(clazz, conf.getManagedConstructorAnnotations());
             if (scope == Scope.SINGLETON && constructor != null) {
                 throw new BeanInstantiationException(String.format(
                         "Failed to register %s : Managed constructor is not supported in singletons", clazz));
             }
 
             BeanDefinition definition;
-            Method[] initMethods = filterByProfile(getUniqueMethodsAnnotatedWith(clazz, configuration.getInitMethodAnnotations()));
-            Method[] destroyMethods = filterByProfile(getUniqueMethodsAnnotatedWith(clazz, configuration.getDestroyMethodAnnotations()));
-            Field[] autowiredFields = filterByProfile(getFieldsAnnotatedWith(clazz, configuration.getAutowiredAnnotations()));
+            Method[] initMethods = filterByProfile(getUniqueMethodsAnnotatedWith(clazz, conf.getInitMethodAnnotations()));
+            Method[] destroyMethods = filterByProfile(getUniqueMethodsAnnotatedWith(clazz, conf.getDestroyMethodAnnotations()));
+            Field[] autowiredFields = filterByProfile(getFieldsAnnotatedWith(clazz, conf.getAutowiredAnnotations()));
             if (constructor != null) {
                 definition = new BeanDefinition(beanId, scope, clazz, constructor, initMethods,
                         destroyMethods, autowiredFields);

@@ -77,19 +77,10 @@ public class BaseBeanLifecycleProcessor implements BeanLifecycleProcessor {
         Class fieldClazz = field.getType();
         BeanDefinition fieldBeanDefinition = beanContainer.getBeanDefinition(fieldClazz);
         if (fieldBeanDefinition == null) {
-            for (Class clazz : beanContainer.getManagedComponentClasses()) {
-                //noinspection unchecked
-                if (fieldClazz.isAssignableFrom(clazz)) {
-                    fieldBeanDefinition = beanContainer.getBeanDefinition(clazz);
-                    break;
-                }
-            }
-            if (fieldBeanDefinition == null) {
-                logger.error("Can not inject property '" + field.getName() + "' in bean " +
-                        definition.beanClass.getName() + ", because property bean class " + fieldClazz.getName()
-                        + " is not present in context.");
-                return;
-            }
+            logger.error("Can not inject property '" + field.getName() + "' in bean " +
+                    definition.beanClass.getName() + ", because property bean class " + fieldClazz.getName()
+                    + " is not present in context.");
+            return;
         }
         try {
             if (!field.isAccessible()) {

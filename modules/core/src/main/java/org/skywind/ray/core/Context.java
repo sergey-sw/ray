@@ -25,7 +25,7 @@ public interface Context {
      * Refreshes the context, destroys all created managed components,
      * re-reads configuration and reloads bean definitions.
      */
-    void refresh();
+    void refresh() throws ContextStartupException;
 
     /**
      * Destroys the context with all created managed components.

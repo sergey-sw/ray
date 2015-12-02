@@ -58,10 +58,10 @@ public abstract class BaseContext implements Context {
                 afterRefresh();
 
                 started = true;
-            } catch (BeanInstantiationException e) {
+            } catch (Exception e) {
                 logger.error("Caught exception during context start. Begin destruction...");
                 beanContainer.destroyBeans();
-                throw e;
+                throw new ContextStartupException(e);
             }
         }
     }

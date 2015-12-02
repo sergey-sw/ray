@@ -30,4 +30,6 @@ public interface BeanContainer {
     <T> T createPrototype(Class<T> beanClass, Object... constructorParams) throws BeanNotFoundException;
 
     <T> T createPrototype(String name, Object... constructorParams) throws BeanNotFoundException;
+
+    int size();
 }

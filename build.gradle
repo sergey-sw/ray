@@ -13,8 +13,14 @@ apply(plugin: 'maven')
 
 idea {
     project {
-        languageLevel = '1.7'
+        languageLevel = '1.8'
+
+        vcs = 'git'
     }
+}
+
+if (JavaVersion.current() != JavaVersion.VERSION_1_8) {
+    throw new GradleException("This build must be run with java 8. Current: " + JavaVersion.current())
 }
 
 def coreModule = project(':ray-core')

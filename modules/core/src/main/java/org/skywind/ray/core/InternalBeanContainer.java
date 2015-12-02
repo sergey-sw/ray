@@ -11,9 +11,7 @@ import org.skywind.ray.meta.InterfaceAudience;
 @InterfaceAudience.Development
 public interface InternalBeanContainer extends BeanContainer {
 
-    Iterable<Class> getManagedComponentClasses();
-
-    BeanDefinition getBeanDefinition(Class beanClass);
+    BeanDefinition getBeanDefinition(Class clazz) throws BeanInstantiationException;
 
     void register(BeanDefinition beanDefinition);
 
@@ -24,6 +22,4 @@ public interface InternalBeanContainer extends BeanContainer {
     void initSingletons();
 
     void destroyBeans();
-
-    int size();
 }

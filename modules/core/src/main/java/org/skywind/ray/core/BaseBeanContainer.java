@@ -5,8 +5,13 @@ import org.skywind.ray.meta.InterfaceAudience;
 import org.skywind.ray.util.Exceptions;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * Author: Sergey42
@@ -18,6 +23,8 @@ public class BaseBeanContainer implements InternalBeanContainer {
 
     protected final Map<String, BeanDefinition> definitionByName = new ConcurrentHashMap<>();
     protected final Map<Class, BeanDefinition> definitionByClass = new ConcurrentHashMap<>();
+    protected final Map<Class, Optional<BeanDefinition>> resolvedDefinitionsByClass = new ConcurrentHashMap<>();
+
     protected final ContextLogger logger;
     protected final BeanLifecycleProcessor beanLifecycleProcessor;
 
@@ -39,7 +46,7 @@ public class BaseBeanContainer implements InternalBeanContainer {
     @Override
     public <T> T getBean(Class<T> beanClass) {
         beanClass = Objects.requireNonNull(beanClass);
-        BeanDefinition beanDefinition = checkNotNull(definitionByClass.get(beanClass), beanClass);
+        BeanDefinition beanDefinition = checkNotNull(getBeanDefinition(beanClass), beanClass);
         validateScope(beanDefinition, Scope.SINGLETON);
         return (T) beanDefinition.singletonInstance;
     }
@@ -53,21 +60,17 @@ public class BaseBeanContainer implements InternalBeanContainer {
     }
 
     @Override
-    public <T> Collection<T> getBeansByType(Class<T> beanClass) {
-        beanClass = Objects.requireNonNull(beanClass);
-        List<T> beansOfType = new ArrayList<>();
-        for (BeanDefinition definition : definitionByClass.values()) {
-            if (definition.scope == Scope.SINGLETON && beanClass.isAssignableFrom(definition.beanClass)) {
-                beansOfType.add((T) definition.singletonInstance);
-            }
-        }
-        return beansOfType;
+    public <T> Collection<T> getBeansByType(final Class<T> beanClass) {
+        return getDefinitionsOfType(beanClass).stream()
+                .filter(d -> d.scope == Scope.SINGLETON)
+                .map(d -> (T) d.singletonInstance)
+                .collect(Collectors.toList());
     }
 
     @Override
     public <T> T createPrototype(Class<T> beanClass) {
         beanClass = Objects.requireNonNull(beanClass);
-        BeanDefinition beanDefinition = checkNotNull(definitionByClass.get(beanClass), beanClass);
+        BeanDefinition beanDefinition = getBeanDefinition(beanClass);
         validateScope(beanDefinition, Scope.PROTOTYPE);
         return createPrototype(beanDefinition);
     }
@@ -83,7 +86,7 @@ public class BaseBeanContainer implements InternalBeanContainer {
     @Override
     public <T> T createPrototype(Class<T> beanClass, Object... constructorParams) {
         beanClass = Objects.requireNonNull(beanClass);
-        BeanDefinition beanDefinition = checkNotNull(definitionByClass.get(beanClass), beanClass);
+        BeanDefinition beanDefinition = checkNotNull(getBeanDefinition(beanClass), beanClass);
         validateScope(beanDefinition, Scope.PROTOTYPE);
 
         try {
@@ -121,11 +124,6 @@ public class BaseBeanContainer implements InternalBeanContainer {
     }
 
     @Override
-    public BeanDefinition getBeanDefinition(Class beanClass) {
-        return definitionByClass.get(Objects.requireNonNull(beanClass));
-    }
-
-    @Override
     public void register(BeanDefinition beanDefinition) {
         Objects.requireNonNull(beanDefinition);
         definitionByName.put(beanDefinition.id, beanDefinition);
@@ -137,30 +135,22 @@ public class BaseBeanContainer implements InternalBeanContainer {
 
     @Override
     public void autowireSingletons() {
-        for (BeanDefinition definition : getBeanDefinitions()) {
-            if (definition.scope == Scope.SINGLETON) {
-                Object beanInstance = definition.singletonInstance;
-                beanLifecycleProcessor.autowireFields(beanInstance, definition);
-            }
-        }
+        StreamSupport.stream(getBeanDefinitions().spliterator(), false)
+                .filter(d -> d.scope == Scope.SINGLETON)
+                .forEach(d -> beanLifecycleProcessor.autowireFields(d.singletonInstance, d));
     }
 
     @Override
     public void initSingletons() {
-        for (BeanDefinition beanDefinition : getBeanDefinitions()) {
-            if (beanDefinition.scope == Scope.SINGLETON) {
-                beanLifecycleProcessor.invokeInitMethods(beanDefinition.singletonInstance, beanDefinition);
-            }
-        }
+        StreamSupport.stream(getBeanDefinitions().spliterator(), false)
+                .filter(d -> d.scope == Scope.SINGLETON)
+                .forEach(d -> beanLifecycleProcessor.invokeInitMethods(d.singletonInstance, d));
     }
 
     @Override
     public synchronized void destroyBeans() {
         logger.info("Destroying beans in container : " + this);
-        for (BeanDefinition definition : definitionByClass.values()) {
-            beanLifecycleProcessor.invokeDestroyMethods(definition.singletonInstance, definition);
-        }
-
+        definitionByClass.values().forEach(d -> beanLifecycleProcessor.invokeDestroyMethods(d.singletonInstance, d));
         definitionByClass.clear();
         definitionByName.clear();
     }
@@ -168,11 +158,6 @@ public class BaseBeanContainer implements InternalBeanContainer {
     @Override
     public int size() {
         return definitionByClass.size();
-    }
-
-    @Override
-    public Iterable<Class> getManagedComponentClasses() {
-        return definitionByClass.keySet();
     }
 
     protected Iterable<BeanDefinition> getBeanDefinitions() {
@@ -201,6 +186,42 @@ public class BaseBeanContainer implements InternalBeanContainer {
         } catch (InstantiationException | IllegalAccessException e) {
             throw new BeanInstantiationException(e);
         }
+    }
+
+    protected Collection<BeanDefinition> getDefinitionsOfType(final Class beanClass) {
+        Objects.requireNonNull(beanClass);
+        return definitionByClass.values().stream()
+                .filter(d -> beanClass.isAssignableFrom(d.beanClass))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public BeanDefinition getBeanDefinition(Class clazz) {
+        BeanDefinition definition = definitionByClass.get(clazz);
+        if (definition != null) {
+            return definition;
+        }
+
+        Optional<BeanDefinition> optional = resolvedDefinitionsByClass.get(clazz);
+        if (optional != null) {
+            return optional.orElse(null);
+        }
+
+        Collection<BeanDefinition> definitionsOfType = getDefinitionsOfType(clazz);
+        if (definitionsOfType.isEmpty()) {
+            resolvedDefinitionsByClass.put(clazz, Optional.empty());
+            return null;
+        }
+
+        if (definitionsOfType.size() > 1) {
+            String msg = BeanInstantiationException.getMultipleCandidatesMessage(clazz, definitionsOfType);
+            logger.error(msg);
+            throw new BeanInstantiationException(msg);
+        }
+
+        definition = definitionsOfType.iterator().next();
+        resolvedDefinitionsByClass.put(clazz, Optional.of(definition));
+        return definition;
     }
 
     protected BeanDefinition checkNotNull(BeanDefinition definition, String id) {
