@@ -16,7 +16,7 @@ Supported features:
 
 - Context of managed components (annotations, xml, json)
 - Singleton and Prototype scopes
-- As-Is component injection
+- Inheritance-aware component injection
 - PostConstruct and PreDestroy lifecycle hooks
 - Profiles for different deployment environments
 
